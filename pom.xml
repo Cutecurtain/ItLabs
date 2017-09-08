@@ -7,7 +7,7 @@
     <groupId>IterLabs</groupId>
     <artifactId>AutoRobyn</artifactId>
     <version>1.0-SNAPSHOT</version>
-
+    
     <build>
         <plugins>
             <plugin>
@@ -20,11 +20,12 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>Main</mainClass>
+                            <mainClass>AutoRobyn</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
+            
         </plugins>
     </build>
 
