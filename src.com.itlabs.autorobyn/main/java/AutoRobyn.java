@@ -15,9 +15,8 @@ public class AutoRobyn extends PlugInComponent {
         super(args);
     }
 
-    public void init() {
-
-    }
+    @Override
+    public void init() {}
 
     public void run() {
         init();
