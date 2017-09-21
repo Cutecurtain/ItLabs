@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "C:\\Users\\Eli\\AndroidProjects\\ItLabs\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\btn_close_normal.png",
+        "source": "C:\\Users\\Eli\\AndroidProjects\\ItLabs\\app\\src\\main\\res\\drawable\\btn_close_normal.png"
+    },
+    {
+        "merged": "C:\\Users\\Eli\\AndroidProjects\\ItLabs\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\bluinotooth.png",
+        "source": "C:\\Users\\Eli\\AndroidProjects\\ItLabs\\app\\src\\main\\res\\drawable\\bluinotooth.png"
+    },
+    {
+        "merged": "C:\\Users\\Eli\\AndroidProjects\\ItLabs\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\emo_im_wtf.png",
+        "source": "C:\\Users\\Eli\\AndroidProjects\\ItLabs\\app\\src\\main\\res\\drawable\\emo_im_wtf.png"
+    }
+]
