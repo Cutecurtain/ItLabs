@@ -1,8 +1,8 @@
 # Should not be on git:
 log
 target
-.idea/*
+.idea
+pi/can-utils
+pi/johnbryanmoore
 
-# Should be on git:
-!.idea/libraries
-!.idea/ItLabs.iml
+
