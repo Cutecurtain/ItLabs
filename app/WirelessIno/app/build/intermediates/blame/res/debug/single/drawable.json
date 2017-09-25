@@ -4,11 +4,23 @@
         "source": "C:\\Users\\Eli\\AndroidStudioProjects\\ItLabs\\app\\WirelessIno\\app\\src\\main\\res\\drawable\\btn_close_normal.png"
     },
     {
+        "merged": "C:\\Users\\Eli\\Documents\\AndroidProjects\\ItLabs\\app\\WirelessIno\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\bluinotooth.png",
+        "source": "C:\\Users\\Eli\\Documents\\AndroidProjects\\ItLabs\\app\\WirelessIno\\app\\src\\main\\res\\drawable\\bluinotooth.png"
+    },
+    {
+        "merged": "C:\\Users\\Eli\\Documents\\AndroidProjects\\ItLabs\\app\\WirelessIno\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\btn_close_normal.png",
+        "source": "C:\\Users\\Eli\\Documents\\AndroidProjects\\ItLabs\\app\\WirelessIno\\app\\src\\main\\res\\drawable\\btn_close_normal.png"
+    },
+    {
         "merged": "C:\\Users\\Eli\\AndroidStudioProjects\\ItLabs\\app\\WirelessIno\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\emo_im_wtf.png",
         "source": "C:\\Users\\Eli\\AndroidStudioProjects\\ItLabs\\app\\WirelessIno\\app\\src\\main\\res\\drawable\\emo_im_wtf.png"
     },
     {
         "merged": "C:\\Users\\Eli\\AndroidStudioProjects\\ItLabs\\app\\WirelessIno\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\bluinotooth.png",
         "source": "C:\\Users\\Eli\\AndroidStudioProjects\\ItLabs\\app\\WirelessIno\\app\\src\\main\\res\\drawable\\bluinotooth.png"
+    },
+    {
+        "merged": "C:\\Users\\Eli\\Documents\\AndroidProjects\\ItLabs\\app\\WirelessIno\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\emo_im_wtf.png",
+        "source": "C:\\Users\\Eli\\Documents\\AndroidProjects\\ItLabs\\app\\WirelessIno\\app\\src\\main\\res\\drawable\\emo_im_wtf.png"
     }
 ]
