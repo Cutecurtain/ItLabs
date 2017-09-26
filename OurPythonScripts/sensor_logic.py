@@ -1,9 +1,4 @@
-import statistics
-
-
-def get_median(values):
-    return statistics.median(values)
-
+from statistics import median
 
 def filter_faulty_values(value):
     if value >= 3:
@@ -17,4 +12,4 @@ def get_sensor_values():
         value = filter_faulty_values(g.can_ultra)
         if value is not None:
             values.append(value)
-    return get_median(values)
+    return median(values)
