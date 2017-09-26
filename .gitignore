@@ -4,5 +4,5 @@ target
 .idea
 pi/can-utils
 pi/johnbryanmoore
-
-
+.gradle
+/build/
