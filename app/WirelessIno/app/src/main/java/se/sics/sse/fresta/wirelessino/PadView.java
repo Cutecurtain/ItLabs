@@ -389,8 +389,8 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 				(screen.height() / 8) - w - 5, (screen.centerX()) + w
 						+ (UMBRAL_TACTIL / 2), (screen.height() / 8) + w + 5);
 
-		bluinoBMP = resizeImage(this.getContext(), R.drawable.bluinotooth,
-				7 * w, 2 * getHeight() / 8);
+		bluinoBMP = resizeImage(this.getContext(), R.drawable.transformer,
+				20 * w, 2 * getHeight() / 8);
 		
 		for (int i=0; i<idMap.length; i++) {
 			idMap[i] = -1;
