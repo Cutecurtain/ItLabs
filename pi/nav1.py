@@ -3,15 +3,16 @@ import time
 import random
 import queue
 
-import nav_log
-from nav_log import tolog, tolog0
+from nav_log import tolog
 
-from nav_util import sign, dist, start_new_thread, rev, min
+from nav_util import start_new_thread
 
 import nav_map
 import driving
 import nav2
 import nav_tc
+
+from globals import g
 
 def nav1init():
     g.user_pause = False
