@@ -12,6 +12,5 @@ def get_filtered_sensor_value(n_updates, min_distance, max_distance):
     values = []
     for i in range(n_updates):
         value = filter_faulty_values(g.can_ultra * 100, min_distance, max_distance)
-        if value is not None:
-            values.append(value)
+        values.append(value)
         return median(values)
