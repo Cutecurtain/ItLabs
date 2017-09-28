@@ -1,4 +1,5 @@
 from statistics import median
+from nav import g
 
 def filter_faulty_values(value):
     if value >= 3:
@@ -6,7 +7,7 @@ def filter_faulty_values(value):
     return None
 
 
-def get_sensor_values():
+def get_filtered_sensor_value():
     values = []
     for i in range(10000):
         value = filter_faulty_values(g.can_ultra)
