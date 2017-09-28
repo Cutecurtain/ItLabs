@@ -2,6 +2,7 @@ package se.sics.sse.fresta.wirelessino;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -19,6 +20,9 @@ import android.view.SurfaceView;
 
 import android.content.pm.ActivityInfo;
 import android.app.Activity;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 public class PadView extends SurfaceView implements Callback, Runnable {
 	private boolean run;
@@ -36,6 +40,8 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 	private Bitmap bluinoBMP;
 	public static final int UMBRAL_TACTIL = 70;
 	private static String canTextL = "", canTextR = "";
+	public Rect myRec, urRec;
+
 
         private Activity host;
 
@@ -44,6 +50,7 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		sh = getHolder();
 		sh.addCallback(this); 
 	}
+
 
 	public void initPaints() {
 		p = new Paint();
@@ -92,6 +99,8 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 			}
 			canvas.drawRect(bar1, p);
 			canvas.drawRect(bar2, p);
+			canvas.drawRect(myRec, pRed);
+			canvas.drawRect(urRec, pYellow);
 			canvas.drawRect(balls[0].getRect(), pControls);
 			// canvas.drawCircle(balls[0].getRect().centerX(),
 			// balls[0].getRect().centerY(), balls[0].getRect().width() / 2,
@@ -153,6 +162,12 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 
 	}
 
+	/*public void changeColour(Rect myRec){ change colour of button when pressed
+		drawRect(myRec, pYellow);
+	}*/
+
+
+
 	@SuppressLint("WrongCall")
 	@Override
 	public void run() {
@@ -172,12 +187,28 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 			}
 		}
 	}
+
+
 	
 	@SuppressLint("ClickableViewAccessibility")
 	public boolean onTouchEvent(MotionEvent event) {
 		int action = event.getAction() & MotionEvent.ACTION_MASK;
 		int pointerIndex = event.getActionIndex();
 		int pointerId = event.getPointerId(pointerIndex);
+
+		/*ImageView image = (ImageView) findViewById(R.id.imageView);
+		image.setImageBitmap(bluinoBMP);
+
+		image.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (view == findViewById(R.id.imageView)) {
+
+					System.out.println("hej!!!");
+					//PUT IN CODE HERE TO GET NEXT IMAGE
+				}
+			}
+		});*/
 		
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
@@ -200,6 +231,28 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 														// secret routine in
 														// Arduino
 				}
+
+				if(urRec.contains(x,y)) {
+					System.out.println("HEEEEJ!!22");
+					String out = "";
+					out = "V0000H0000";
+					//Main.send("Meddelande till socketen att sluta köra kolonn");
+					if (Main.socket != null)
+						Main.send(out);
+					System.out.println(out);
+				}
+
+				if(myRec.contains(x,y)) {
+					//changeColour(Rect myRec);
+					System.out.println("HEEEEJ!!");
+					String out = "";
+					out = "V0020H0000";
+					//Main.send("Meddelande till socketen att köra kolonn");
+					if (Main.socket != null)
+						Main.send(out);
+					System.out.println(out);
+				}
+
 	
 				/* Check if a new ball should be activated */
 				for (int i=0; i<balls.length; i++) {
@@ -288,7 +341,9 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 					}
 					origenY[ballId] = touchY[ballId];
 					origenX[ballId] = touchX[ballId];
+
 				}
+
 				break;
 			default:		
 		}
@@ -343,6 +398,8 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		canTextR = intToString(x3);
 		out += "H" + canTextR;
 
+		System.out.println("Meddelandet till mopeden: " + out);
+
 		/* Send speed and steering values through the socket */ 
 		if (Main.socket != null)
 			Main.send(out);
@@ -389,8 +446,14 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 				(screen.height() / 8) - w - 5, (screen.centerX()) + w
 						+ (UMBRAL_TACTIL / 2), (screen.height() / 8) + w + 5);
 
+		//sends code to socket currently to 20 V RED
+		myRec = new Rect(50,50,(getWidth() - 50) /2,150);
+
+		//sends code to socket currently to 00 V YELLOW
+		urRec = new Rect(((getWidth()/2)),(getWidth()/8) + 10,getWidth() - 50, 50);
+
 		bluinoBMP = resizeImage(this.getContext(), R.drawable.transformer,
-				20 * w, 2 * getHeight() / 8);
+				10 * w, 2 * getHeight() / 8);
 		
 		for (int i=0; i<idMap.length; i++) {
 			idMap[i] = -1;
