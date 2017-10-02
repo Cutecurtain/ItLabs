@@ -21,9 +21,9 @@ def new_client(client_socket):
     client_thread.run()
 
 def nop(args): pass
-def mov(args): g.outspeedcm = args(1)[0]
-def trn(args): g.steering = args(1)[0]
-def acc(args): args(1) # ...
+def mov(args): g.outspeedcm = int.from_bytes(args(1), "big")
+def trn(args): g.steering = int.from_bytes(args(1), "big")
+def acc(args): int.from_bytes(args(1), "big") # ...
 def brk(args): raise StopIteration
 
 
@@ -39,6 +39,6 @@ instr = {
 def run_client(client_socket):
     try:
         while True:
-            instruction = client_socket.recv(1)[0]
+            instruction = int.from_bytes(client_socket.recv(1), "big")
             instr[instruction](client_socket.recv)
     except StopIteration: pass
