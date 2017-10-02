@@ -9,6 +9,8 @@ from nav_util import start_new_thread
 import nav_signal
 import nav2
 
+from globals import g
+
 prevprint1s = None
 
 def print1(g, s):
@@ -78,6 +80,14 @@ def from_ground_control():
                     # currently, we don't do anything with this path
                 elif l[0] == "continue":
                     g.paused = False
+                elif l[0] == "carpos":
+                    carname = l[1]
+                    x = float(l[2])
+                    y = float(l[3])
+                    g.posnow[carname] = (x, y)
+                    if carname not in g.otherpos:
+                        g.otherpos[carname] = queue.Queue(100000)
+                    g.otherpos[carname].put((x, y))
                 elif l[0] == "carsinfront":
                     if l != prevl:
                         pass

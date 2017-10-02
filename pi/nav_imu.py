@@ -1,11 +1,11 @@
 import smbus
 import time
 
-import faulthandler
-
-from math import sqrt, cos, sin, pi, atan2, acos, asin
+from math import sqrt, cos, sin, pi, asin
 
 import nav_log
+
+from globals import g
 
 imuaddress = 0x68
 
