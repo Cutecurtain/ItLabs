@@ -5,10 +5,12 @@ import nav_map
 import driving
 import nav_tc
 
-from nav_log import tolog, tolog0, tolog2
+from nav_log import tolog, tolog2
 from nav_util import sign, dist, start_new_thread
 
-from math import pi, cos, sin, sqrt, atan2, acos, asin, log
+from math import pi, cos, sin, atan2
+
+from globals import g
 
 def checkbox1(x, y, tup, leftp):
     (lxprev, lyprev, lx, ly) = tup
