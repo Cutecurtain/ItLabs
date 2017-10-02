@@ -1,22 +1,44 @@
 import socket
-
-class car_driver:
-
-
-    def __init__(self,pwm_ecu_ID):
-        self.pwm_ecu_ID = pwm_ecu_ID
-
-    def run(self):
-        try:
-            serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            serversocket.bind((socket.gethostname(), 9003))
-            serversocket.listen(5)
-
-            while True:
-                (clientsocket, address) = serversocket.accept()
-
-            
-        except IOError as e:
-            print(e)
+import threading
+from nav import g
 
 
+def run():
+    try:
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.bind((socket.gethostname(), 3000))
+        server_socket.listen(5)
+
+        while True:
+            (client_socket, address) = server_socket.accept()
+            new_client(client_socket)
+    except IOError as e:
+        print(e)
+
+
+def new_client(client_socket):
+    client_thread = threading.Thread(target=run_client, args=(client_socket,))
+    client_thread.run()
+
+def nop(args): pass
+def mov(args): g.outspeedcm = args(1)[0]
+def trn(args): g.steering = args(1)[0]
+def acc(args): args(1) # ...
+def brk(args): raise StopIteration
+
+
+instr = {
+    0x00: nop,
+    0x01: mov,
+    0x02: trn,
+    0x03: acc,
+    0xFF: brk,
+}
+
+
+def run_client(client_socket):
+    try:
+        while True:
+            instruction = client_socket.recv(1)[0]
+            instr[instruction](client_socket.recv)
+    except StopIteration: pass
