@@ -8,8 +8,13 @@ class car_driver:
 
     def run(self):
         try:
-            server = socket.socket()
-            server.bind(('',9001))
+            serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            serversocket.bind((socket.gethostname(), 9003))
+            serversocket.listen(5)
+
+            while True:
+                (clientsocket, address) = serversocket.accept()
+
             
         except IOError as e:
             print(e)
