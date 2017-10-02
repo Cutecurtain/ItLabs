@@ -6,7 +6,7 @@ from nav import g
 def run():
     try:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind((socket.gethostname(), 3000))
+        server_socket.bind(("", 3000))
         server_socket.listen(5)
 
         while True:
