@@ -17,7 +17,7 @@ public class Main extends Activity {
 	public static Socket socket = null;
 	public static final boolean D = true; // The debug option
 	
-	private static PrintWriter out = null;
+	public static MopedStream mopedStream = null;
 	private PadView view = null;
 	private Menu menu = null;
 	
@@ -92,8 +92,7 @@ public class Main extends Activity {
 	public static void init(Socket socket) {
 		Main.socket = socket;
 		try {
-			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(
-					socket.getOutputStream())), true);
+			mopedStream = new MopedStream(socket.getOutputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -102,10 +101,10 @@ public class Main extends Activity {
 	/*
 	 * Send a message through the socket.
 	 */
-	public static void send(Object message) {
+	/*public static void send(Object message) {
 		out.println(message);
 	}
-	
+	*/
 	/*
 	 * Checks if a socket connection has been established and updates
 	 * the visibility of the "disconnect" menu option accordingly.    

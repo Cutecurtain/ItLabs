@@ -23,6 +23,7 @@ public class SocketConnector extends Activity {
 	private EditText ed_port = null;
 	private Button   btn_connect = null;
 	private Socket   socket = null;
+	MopedStream mopedStream;
 
 	protected void onCreate(Bundle savedInstanceState) {
 	    
@@ -92,13 +93,18 @@ public class SocketConnector extends Activity {
 
 				/* Close any previously used socket 
 				 * (for example to prevent double-clicks leading to multiple connections) */
-				if (socket != null && !socket.isClosed())
-					socket.close();
+				if (socket != null && !socket.isClosed()) {
+
+
+					mopedStream.close();
+				}
 				
 				socket = new Socket();
 				socket.connect(new InetSocketAddress(params[0],						// host ip 
 													 Integer.parseInt(params[1])), 	// port 
 							   CONNECTION_TIMEOUT);
+				mopedStream = new MopedStream(socket.getOutputStream());
+
 			} catch (NumberFormatException e) {
 				msg = "Invalid port value (" + params[1] + "), type an integer between 0 and 65535";
 			} catch (IllegalArgumentException e) { 
