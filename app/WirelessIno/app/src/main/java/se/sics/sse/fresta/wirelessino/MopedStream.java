@@ -23,7 +23,7 @@ public class MopedStream extends OutputStream {
 	}
 	public void acc(boolean enable) {
 		write(ACC);
-		write(b?1:0);
+		write(enable?1:0);
 	}
 
 	@Override
