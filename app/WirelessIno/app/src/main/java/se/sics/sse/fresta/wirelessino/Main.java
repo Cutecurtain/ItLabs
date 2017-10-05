@@ -100,11 +100,12 @@ public class Main extends Activity {
 
 	/*
 	 * Send a message through the socket.
-	 */
-	/*public static void send(Object message) {
+	 *
+	public static void send(Object message) {
 		out.println(message);
 	}
 	*/
+
 	/*
 	 * Checks if a socket connection has been established and updates
 	 * the visibility of the "disconnect" menu option accordingly.    
