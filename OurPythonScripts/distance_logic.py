@@ -8,5 +8,10 @@ distance_scaling = 1.1
 #	return min_dist + distance_scaling * current_speed
 
 def optimal_speed(current_distance):
-	return current_distance * 1000 - 100
+	speed = current_distance * 1000 - 100
+	if (speed > 100):
+		speed = 100
+	if (speed < -100):
+		speed = -100
+	return speed
 	
