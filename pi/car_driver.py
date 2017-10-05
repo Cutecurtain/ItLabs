@@ -5,7 +5,7 @@ def run():
 	try:
 		server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server_socket.bind(("", 3000))
-		server_socket.listen()
+		server_socket.listen(5)
 		while True:
 			(client_socket, address) = server_socket.accept()
 			new_client(client_socket)
@@ -25,9 +25,15 @@ def new_client(client_socket):
 def instr(): # Scoping
 	from nav import g
 	def nop(stream): pass
-	def mov(stream): g.outspeedcm = stream(signed=True)
-	def trn(stream): g.steering =  stream(signed=True)
-	def acc(stream): bool(stream()) # Just to consume a byte for now.
+	def mov(stream):
+		g.outspeedcm = stream(signed=True)
+		print("mov", g.outspeedcm)
+	def trn(stream):
+		g.steering =  stream(signed=True)
+		print("trn", g.steering - 50)
+	def acc(stream):
+		bool(stream()) # Just to consume a byte for now.
+		print("acc")
 	def brk(stream): pass # For eventual deinitialization, will only be called once.
 	return {
 		0x00: nop,

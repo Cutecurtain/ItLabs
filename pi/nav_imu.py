@@ -60,7 +60,7 @@ def sleep(x):
 
 def imuinit():
 
-    imuinit0()
+    #imuinit0()
 
     g.bus.write_byte_data(imuaddress, 0x6b, 0x80)
     sleep(0.1)
