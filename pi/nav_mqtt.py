@@ -5,9 +5,8 @@ import urllib
 import urllib.parse
 import paho.mqtt.client as mosquitto
 
+import nav_tc
 from nav_tc import send_to_ground_control
-
-from globals import g
 
 def on_message(mosq, obj, msg):
     p = str(msg.payload)

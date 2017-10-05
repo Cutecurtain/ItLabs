@@ -1,23 +1,36 @@
+import sys
+import threading
+
+from math import sqrt
+
 def dist(x1, y1, x2, y2):
-    from math import sqrt
-    return sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
+    return sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2))
 
 def sign(x):
-    if x == 0:
-        return 0
-    else:
-        from math import copysign
-        return int(copysign(1, x))
+    if x < 0:
+        return -1
+    if x > 0:
+        return 1
+    return 0
 
 def start_new_thread(f, args):
-    from sys import version_info
-    from threading import Thread
-    if version_info < (3,):
-        thread = Thread(target=f, args=args)
-    else:
-        thread = Thread(target=f, args=args, daemon=True)
-    thread.start()
-    return thread
+    return start_new_thread_really(f, args)
 
-rev = reversed
-min = min
+def start_new_thread_really(f, args):
+    # can be done much better with packaging.Version or something
+    version = sys.version.split(" ")[0].split(".")
+    if int(version[1]) < 3:
+        threading.Thread(target=f, args=args).start()
+    else:
+        threading.Thread(target=f, args=args, daemon=True).start()
+
+def rev(l0):
+    l = l0[:]
+    l.reverse()
+    return l
+
+def min(x, y):
+    if x < y:
+        return x
+    else:
+        return y

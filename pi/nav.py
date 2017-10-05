@@ -1,5 +1,6 @@
 import re
 import time
+import os
 import socket
 import sys
 import json
@@ -10,7 +11,10 @@ import eight
 
 import nav_mqtt
 
-from globals import g
+class globals:
+    pass
+
+g = globals()
 
 def readvin():
     g.simulate = False
@@ -32,7 +36,7 @@ def readvin():
     return None
 
 g.VIN = readvin()
-print("VIN " + g.VIN)
+print("VIN %s" % g.VIN)
 
 if not g.simulate:
     import nav_imu
@@ -41,10 +45,12 @@ g.standalone = True
 g.standalone = False
 
 import nav_log
-from nav_log import tolog
+from nav_log import tolog, tolog0
 
-from nav_util import sign, dist, start_new_thread
+from nav_util import sign, dist, start_new_thread, start_new_thread_really
 
+if not g.simulate:
+    import nav_mqtt
 import nav_tc
 
 import nav_signal
@@ -53,6 +59,21 @@ import nav2
 import nav_comm
 import wm
 import driving
+
+from math import pi, cos, sin, sqrt, atan2, acos, asin, log
+
+
+if not g.simulate:
+    nav_imu.g = g
+nav_log.g = g
+nav_mqtt.g = g
+nav_tc.g = g
+nav_signal.g = g
+nav_comm.g = g
+wm.g = g
+nav1.g = g
+nav2.g = g
+driving.g = g
 
 g.s = None
 
@@ -169,7 +190,6 @@ g.limitspeed = None
 
 # local to 'heartbeat' in nav.py
 g.limitspeed0 = "notset"
-g.heartwarn = 5
 
 g.last_send = None
 
@@ -239,9 +259,6 @@ g.acc = 0
 # nav_tc
 g.tctime = None
 
-g.otherpos = dict()
-g.posnow = dict()
-
 wm.wminit()
 nav1.nav1init()
 if not g.simulate:
@@ -271,7 +288,7 @@ def connect_to_ecm():
             if not stopped:
                 counter = 9
                 #s.send("crash".encode('ascii'))
-                print(f"crash: {g.crash:f}")
+                print("crash: %f" % g.crash)
                 g.remote_control = True
                 #stop()
                 driving.drive(0)
@@ -279,7 +296,8 @@ def connect_to_ecm():
                 nav_signal.warningblink(True)
                 stopped = True
                 s112 = nav_comm.open_socket3()
-                sstr = f'accident {g.ppx:f} {g.ppy:f} {g.crashacc:f} {g.crashacc:s}\n'.encode("ascii")
+                sstr = ('accident %f %f %f %s\n' % (
+                        g.ppx, g.ppy, g.crashacc, g.VIN)).encode("ascii")
                 print(sstr)
                 s112.send(sstr)
                 print(sstr)
@@ -294,10 +312,8 @@ def connect_to_ecm():
                 else:
                     say = resp
                 print(say)
-                # Same effect, but explicit.
-                raise NameError("name 'speak' is not defined")
-                # speak(say)
-                # s112.close()
+                speak(say)
+                s112.close()
 
         if True:
             t = time.time()
@@ -306,8 +322,10 @@ def connect_to_ecm():
                 g.crashacc = 0.0
                 if g.crash:
                     g.crashacc = g.crash
-                    nav_tc.send_to_ground_control(f"message crash {g.crashacc:f}")
-                    s.send(f'{{"crash":{counter:d}, "x":{g.ppx:f}, "y":{g.ppy:f}, "crashacc":{g.crashacc:f}}}\n'.encode("ascii"))
+                    nav_tc.send_to_ground_control(
+                        "message crash %f" % g.crashacc)
+                s.send(('{"crash":%d, "x":%f, "y":%f, "crashacc":%f}\n' % (
+                            counter, g.ppx, g.ppy, g.crashacc)).encode("ascii"))
                 ecmt0 = t
         time.sleep(0.05)
         if counter != 9:
@@ -322,18 +340,19 @@ def heartbeat():
         g.heartn += 1
         diff = g.heartn - g.heartn_r
         if diff < maxdiff:
-            if maxdiff >= g.heartwarn:
-                print(f"heart {g.heartn:d} {g.heartn_r:d}: {maxdiff:d} ({time.time():d})")
+            if maxdiff > 2:
+                print("heart %d %d: %d" % (g.heartn, g.heartn_r, maxdiff))
             maxdiff = 1
         elif diff > maxdiff:
             maxdiff = diff
-            if maxdiff % 50 == 0:
-                print(f"heart {g.heartn:d} {g.heartn_r:d}: {maxdiff:d} ({time.time():d})")
+            if maxdiff % 50 == 51:
+                print("heart %d %d: %d" % (g.heartn, g.heartn_r, maxdiff))
 
-        nav_tc.send_to_ground_control(f"heart {time.time()-g.t0:.3f} {g.heartn:d}")
+        nav_tc.send_to_ground_control(
+            "heart %.3f %d" % (time.time()-g.t0, g.heartn))
 
         if g.heartn-g.heartn_r > 1:
-            tolog(f"waiting for heart echo {g.heartn:d} {g.heartn_r:d}")
+            tolog("waiting for heart echo %d %d" % (g.heartn, g.heartn_r))
 
         if g.heartn-g.heartn_r > 3:
             if g.limitspeed0 == "notset":
@@ -343,7 +362,7 @@ def heartbeat():
 
         if g.heartn-g.heartn_r < 2:
             if g.limitspeed0 != "notset":
-                tolog(f"restoring speed limit to {g.limitspeed0!s} after network pause")
+                tolog("restoring speed limit to %s after network pause" % (str(g.limitspeed0)))
                 g.limitspeed = g.limitspeed0
                 g.limitspeed0 = "notset"
 
@@ -352,7 +371,7 @@ def heartbeat():
 def heartbeat2():
     while True:
 
-        if g.tctime is not None:
+        if g.tctime != None:
             tdiff = time.time() - g.tctime
             print(tdiff)
             if tdiff > 0.2:
@@ -363,7 +382,7 @@ def heartbeat2():
 
             else:
                 if g.limitspeed0 != "notset":
-                    tolog(f"restoring speed limit to {g.limitspeed0!s} after network pause")
+                    tolog("restoring speed limit to %s after network pause" % (str(g.limitspeed0)))
                     g.limitspeed = g.limitspeed0
                     g.limitspeed0 = "notset"
 
@@ -404,7 +423,7 @@ def init():
         g.mymax = 100
 
     canNetwork = "can0"
-    # canFrameID = 1025
+    canFrameID = 1025
     if not g.simulate:
         g.canSocket = initializeCAN(canNetwork)
 
@@ -435,23 +454,31 @@ def init():
 
     g.qlen = 0
 
-    tolog(f"t0 = {g.t0:f}")
+    tolog("t0 = %f" % g.t0)
 
     tolog("init")
 
+    if not g.simulate:
+        nav_imu.calibrate_imu()
+
+    if not g.simulate:
+        start_new_thread(wm.readmarker, ())
+#    if not g.simulate:
     start_new_thread(nav_mqtt.handle_mqtt, ())
+    if not g.simulate:
+        start_new_thread(wm.readspeed2, ())
+    if not g.simulate:
+        start_new_thread_really(nav_imu.readgyro, ())
+    if not g.simulate:
+        start_new_thread(driving.senddrive, ())
+    if not g.simulate:
+        start_new_thread(keepspeed, ())
     if not g.standalone:
         start_new_thread(heartbeat, ())
     if not g.simulate:
-        nav_imu.calibrate_imu()
-        start_new_thread(wm.readmarker, ())
-        start_new_thread(wm.readspeed2, ())
-        start_new_thread(nav_imu.readgyro, ())
-        start_new_thread(driving.senddrive, ())
-        start_new_thread(keepspeed, ())
         start_new_thread(connect_to_ecm, ())
-        start_new_thread(pos_thread, ())
-    else:
+
+    if g.simulate:
         g.steering = 0
         g.finspeed = 0
         start_new_thread(wm.simulatecar, ())
@@ -474,14 +501,14 @@ def keepspeed():
     while True:
         time.sleep(0.1)
 
-        if g.outspeedcm is None:
+        if g.outspeedcm == None:
             continue
 
         spi = outspeedi
 
         desiredspeed = g.outspeedcm
 
-        if g.limitspeed is not None and desiredspeed > g.limitspeed:
+        if g.limitspeed != None and desiredspeed > g.limitspeed:
             desiredspeed = g.limitspeed
 
         if g.user_pause:
@@ -517,11 +544,12 @@ def keepspeed():
             g.speedtime = None
 
         if g.outspeed == sp and sp != 0:
-            # pass
+#            pass
             continue
 
         if False:
-            print(f"outspeedcm {g.outspeedcm:f} finspeed {g.finspeed:f} outspeedi {outspeedi:d} spi {spi:d} sp {sp:f} outspeed {g.outspeed:f}")
+            print("outspeedcm %f finspeed %f outspeedi %d spi %d sp %f outspeed %f" % (
+                    g.outspeedcm, g.finspeed, outspeedi, spi, sp, g.outspeed))
 
         g.outspeed = sp
 
@@ -536,7 +564,7 @@ def keepspeed():
         st = g.steering
 #        if st < 0:
 #            st += 256
-        tolog(f"motor {sp:d} steer {sp:d}")
+        tolog("motor %d steer %d" % (sp, st))
         driving.dodrive(sp, st)
         time.sleep(sleeptime)
 
@@ -590,14 +618,14 @@ def goovalaux(perc0):
         print("2")
         nav2.goto_1(1.9, 17)
         print("3")
-        print("marker " + str(g.lastpos))
+        print("marker %s" % (str(g.lastpos)))
         driving.steer(-100)
         print("4")
         # 250 comes from pi*80 (cm)
         # it's the outer radius, but so is the speed we get
-        print(f"finspeed1 {g.finspeed:f} dang1 {g.dang:f} ang1 {g.ang%360:f}")
+        print("finspeed1 %f dang1 %f ang1 %f" % (g.finspeed, g.dang, g.ang%360))
         time.sleep(250.0/g.finspeed*perc)
-        print(f"finspeed1 {g.finspeed:f} dang1 {g.dang:f} ang1 {g.ang%360:f}")
+        print("finspeed2 %f dang2 %f ang2 %f" % (g.finspeed, g.dang, g.ang%360))
         driving.steer(0)
         print("5")
         nav2.goto_1(0.5, 13)
@@ -636,13 +664,13 @@ def m3(q = 0.5):
 
 def wait1():
     nav_tc.send_to_ground_control("waitallcars\n")
-    # x = g.queue.get()
+    x = g.queue.get()
     g.queue.task_done()
 
 def follow():
-    # speeds = [0, 7, 11, 15, 19, 23, 27, 37, 41, 45, 49,
-    #           # 93 to 100 haven't been run yet
-    #           53, 57, 73, 77, 81, 85, 89, 93, 97, 100]
+    speeds = [0, 7, 11, 15, 19, 23, 27, 37, 41, 45, 49,
+              # 93 to 100 haven't been run yet
+              53, 57, 73, 77, 81, 85, 89, 93, 97, 100]
 
     sp = None
     while True:
@@ -651,7 +679,7 @@ def follow():
         sp = x-10
         if sp < 0:
             sp = 0
-        print(f"{g.finspeed:f} {sp:f}")
+        print("%f %f" % (g.finspeed, sp))
         if sp > 25:
             sp = 0
         if sp != oldsp:
@@ -672,10 +700,11 @@ def auto():
         ang = g.ang%360
         if ang > 180:
             ang -= 360
-        print(f"pos {g.ppx:f} {g.ppy:f} {ang:f}")
+        print("pos %f %f %f" % (g.ppx, g.ppy, ang))
         if (abs(g.ppx-2.5) < 0.5 and
             abs(g.ppy-14.2) < 0.5 and
-            abs(ang) < 30): break
+            abs(ang) < 30):
+            break
         time.sleep(1)
 
     driving.steer(0)
@@ -684,95 +713,3 @@ def auto():
 
     while True:
         time.sleep(100)
-
-def pos_thread():
-    while True:
-        nav_tc.send_to_ground_control(f"dpos {g.ppx:f} {g.ppy:f} {g.ang:f} {time.time():f} 0 {g.finspeed:f}")
-        time.sleep(0.1)
-
-def platoon(other):
-    driving.drive(0)
-    while other not in g.otherpos:
-        time.sleep(1)
-    print(f"a queue appeared for {other:s}")
-    q = g.otherpos[other]
-    follow = False
-    lastx = None
-    lasty = None
-    slowsp = 15
-    fastsp = 25
-
-    goingslow = True
-
-    tb1 = None
-
-    while True:
-        #print("q length %d" % q.qsize())
-        (x1, y1) = g.posnow[other]
-        t0 = time.time()
-        (x, y) = q.get()
-        t1 = time.time()
-        #print("got (%f %f) (%f %f)" % (x, y, x1, y1))
-        q.task_done()
-        if y1 > 15.0 and not follow:
-            follow = True
-            driving.drive(fastsp)
-
-        if not follow:
-            continue
-
-        if t1-t0 > 0.1:
-            print(f"waited {t1-t0:f}")
-
-        near = 0.5+0.3
-        near = 0.6+0.3
-        d = dist(x1, y1, g.ppx, g.ppy)
-        if d < near and not goingslow:
-            print(f"dist {d:f}, speed {slowsp:d}")
-            goingslow = True
-            driving.drive(slowsp)
-        if d > near and goingslow:
-            print(f"dist {d:f}, speed {fastsp:d}")
-            goingslow = False
-            driving.drive(fastsp)
-
-        if lastx is not None:
-            if dist(x, y, lastx, lasty) < 0.5:
-                continue
-
-        lastx = x
-        lasty = y
-
-        tb0 = time.time()
-        if tb1 is not None and tb0-tb1 > 0.1:
-            print(f"waitedb {tb0-tb1:f}")
-
-        # status = nav2.goto_1(x, y)
-        #print((status, g.ppx, g.ppy))
-        tb1 = time.time()
-
-def runfile(file):
-    f = open(file)
-    driving.drive(20)
-    for line0 in f:
-        line = line0[:-1]
-        l = line.split("\t")
-        x = float(l[0])
-        y = float(l[1])
-        #t = float(l[2])
-        print((x, y))
-
-        t = time.time()
-        ti = int(t)
-        if ti/2 % 2 == 0:
-            driving.drive(20)
-        else:
-            driving.drive(10)
-
-        status = nav2.goto_1(x, y)
-        print((status, g.ppx, g.ppy))
-
-    driving.drive(0)
-
-if __name__ == "__main__":
-    init()

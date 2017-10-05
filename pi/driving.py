@@ -3,10 +3,8 @@ import time
 
 import nav_signal
 
-from nav_log import tolog
+from nav_log import tolog, tolog0
 from nav_util import sign
-
-from globals import g
 
 def dodrive(sp, st):
     #print("dodrive %d %d" % (sp, st))
@@ -21,7 +19,7 @@ def drive(sp):
             g.speedsign = sign(sp)
 
         g.outspeedcm = sp*2
-        #print("outspeedcm = %d" % g.outspeedcm)
+        print("outspeedcm = %d" % g.outspeedcm)
     else:
 
         # do this in readspeed2 instead
@@ -150,12 +148,3 @@ def drivinginit():
     g.send_sp = None
     g.send_st = None
 
-def smallstep(dir):
-    if dir == 1:
-        dodrive(15, g.send_st)
-        time.sleep(0.3)
-        dodrive(0, g.send_st)
-    elif dir == -1:
-        dodrive(-25, g.send_st)
-        time.sleep(0.5)
-        dodrive(0, g.send_st)

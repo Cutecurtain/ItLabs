@@ -2,8 +2,6 @@ import os
 
 from nav_util import start_new_thread
 
-from globals import g
-
 def signal():
     while g.signalling:
         os.system("(python tone2.py 8000 3000 1200;python tone2.py 8000 3000 1000) 2>/dev/null")

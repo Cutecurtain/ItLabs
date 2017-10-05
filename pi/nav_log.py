@@ -2,8 +2,6 @@ import time
 
 from nav_util import dist
 
-from globals import g
-
 def tologaux(str0, level):
 
     if g.targetx and g.targety:
