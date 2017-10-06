@@ -9,9 +9,9 @@ distance_scaling = 1.1
 
 def optimal_speed(current_distance):
 	speed = current_distance * 240 - 100
-	if (speed > 100):
-		speed = 100
-	if (speed < -100):
-		speed = -100
+	if (speed > 40):
+		speed = 40
+	if (speed < -40):
+		speed = -40
 	return speed
 	
