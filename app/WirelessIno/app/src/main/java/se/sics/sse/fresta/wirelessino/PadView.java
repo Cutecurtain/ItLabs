@@ -30,7 +30,7 @@ import java.net.Socket;
 public class PadView extends SurfaceView implements Callback, Runnable {
 	private boolean run;
 	private SurfaceHolder sh;
-        private Paint p, pRed, pBlue, pYellow, pControls;
+	private Paint p, pRed, pBlue, pYellow, pControls;
 	public Ball balls[]   = new Ball[2];
 	private int touchX[]  = new int[balls.length], 
 				touchY[]  = new int[balls.length],
@@ -45,10 +45,7 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 	private static String canTextL = "", canTextR = "";
 	public Rect myRec, urRec;
 
-	private Socket socket;
-
-
-        private Activity host;
+	private Activity host;
 
 	public PadView(Context context) {
 		super(context);
@@ -201,19 +198,9 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		int pointerIndex = event.getActionIndex();
 		int pointerId = event.getPointerId(pointerIndex);
 
-		/*ImageView image = (ImageView) findViewById(R.id.imageView);
-		image.setImageBitmap(bluinoBMP);
+		Socket socket = Main.socket;
+		MopedStream mopedStream = Main.mopedStream;
 
-		image.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (view == findViewById(R.id.imageView)) {
-
-					System.out.println("hej!!!");
-					//PUT IN CODE HERE TO GET NEXT IMAGE
-				}
-			}
-		});*/
 		
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
@@ -238,29 +225,14 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 														*/
 				}
 
-				/*if(urRec.contains(x,y)) {
-					System.out.println("HEEEEJ!!22");
-					String out = "";
-					out = "V0000H0000";
-					//Main.send("Meddelande till socketen att sluta köra kolonn");
-					if (Main.socket != null)
-						Main.send(out);
-					System.out.println(out);
-				}*/
 
 				if(myRec.contains(x,y)) {
-
-
-					//changeColour(Rect myRec);
 					System.out.println("HEEEEJ!!");
-					String out = "";
-					out = "V0020H0000";
-
-
-					//Main.send("Meddelande till socketen att köra kolonn");
-					/*if (Main.socket != null)
-						Main.send(out);
-					System.out.println(out);*/
+					if(mopedStream.getAccStatus){
+						mopedstream.acc(false);
+					}else{
+						mopedstream.acc(true);
+					}
 				}
 
 	
@@ -341,7 +313,7 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 									- origenY[ballId]);
 
 							try {
-								transformPWM(); //balls[ballId], bar2, Options.getInstance().getRBarValue());
+								transformPWM(mopedstream, socket); //balls[ballId], bar2, Options.getInstance().getRBarValue());
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
@@ -386,12 +358,9 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		return -1;
 	}
 
-	public synchronized void transformPWM() throws IOException {
+	public synchronized void transformPWM(MopedStream mopedstream, Socket socket) throws IOException {
 		double dist;
 		int x;
-		socket = Main.socket;
-
-		MopedStream mopedStream = Main.mopedStream;
 		
 		/* Calc and output speed values using the left bar */ 
 		dist = bar1.bottom - balls[0].getRect().centerY();
@@ -399,27 +368,16 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		if (x < 0)
 			x--;
 
-
 		if (socket != null) {
 			System.out.println(x);
 			mopedStream.move((byte) x);
 		}
-
-
-
-		//canTextL = intToString(x);
-		//out = "V" + canTextL;
-
-		
-		int speed = x;
-
 
 		/* Calc and output steering values using the right bar */
 		dist = balls[1].getRect().centerX() - bar2.left;
 		x = (int) Math.ceil((Options.getInstance().getRBarValue() / (bar2.width() / dist)) - 100);
 		if (x < 0)
 			x--;
-
 
 		double lambda = x/100.0;
 		if (lambda < 0)
