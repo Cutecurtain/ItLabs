@@ -1,11 +1,14 @@
 import socket
 import threading
+import speed_controll
+
+is_acc = False
 
 def run():
 	try:
 		server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server_socket.bind(("", 3000))
-		server_socket.listen()
+		server_socket.listen(5)
 		while True:
 			(client_socket, address) = server_socket.accept()
 			new_client(client_socket)
@@ -27,7 +30,11 @@ def instr(): # Scoping
 	def nop(stream): pass
 	def mov(stream): g.outspeedcm = stream(signed=True)
 	def trn(stream): g.steering =  stream(signed=True)
-	def acc(stream): bool(stream()) # Just to consume a byte for now.
+	def acc(stream):
+		is_acc = bool(stream()) # Just to consume a byte for now.
+		if is_acc:
+			acc_thread = threading.Thread(target=acc, args=())
+			acc_thread.run()
 	def brk(stream): pass # For eventual deinitialization, will only be called once.
 	return {
 		0x00: nop,
@@ -37,6 +44,12 @@ def instr(): # Scoping
 		0xFF: brk
 	}
 instr = instr()
+
+def acc():
+	while is_acc:
+		adjust_to_optimal_speed()
+        sleep(0.1)
+
 
 class SocketStream:
 	def __init__(self, client):
