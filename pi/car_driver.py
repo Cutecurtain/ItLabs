@@ -1,6 +1,7 @@
 import socket
 import threading
-import speed_controll
+from speed_controll import adjust_to_optimal_speed
+import time
 
 is_acc = False
 
@@ -31,9 +32,10 @@ def instr(): # Scoping
 	def mov(stream): g.outspeedcm = stream(signed=True)
 	def trn(stream): g.steering =  stream(signed=True)
 	def acc(stream):
+		global is_acc
 		is_acc = bool(stream()) # Just to consume a byte for now.
 		if is_acc:
-			acc_thread = threading.Thread(target=acc, args=())
+			acc_thread = threading.Thread(target=accSpeed)
 			acc_thread.run()
 	def brk(stream): pass # For eventual deinitialization, will only be called once.
 	return {
@@ -45,10 +47,12 @@ def instr(): # Scoping
 	}
 instr = instr()
 
-def acc():
+def accSpeed():
+	print("I live!")
+	print(is_acc)
 	while is_acc:
 		adjust_to_optimal_speed()
-        sleep(0.1)
+		time.sleep(0.1)
 
 
 class SocketStream:

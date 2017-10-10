@@ -6,6 +6,7 @@ from distance_logic import optimal_speed
 def adjust_to_optimal_speed():
     #in cm
     current_distance = get_filtered_sensor_value(0.10, 2)
+    print(current_distance)
     # g.speed?? probably not right
     #new_distance = optimal_distance(g.speed)
     if current_distance != None:
