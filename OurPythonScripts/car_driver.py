@@ -33,10 +33,10 @@ def instr(): # Scoping
 	def trn(stream): g.steering =  stream(signed=True)
 	def acc(stream):
 		global is_acc
-		is_acc = bool(stream()) # Just to consume a byte for now.
+		is_acc = bool(stream())
 		if is_acc:
 			acc_thread = threading.Thread(target=accSpeed)
-			acc_thread.run()
+			acc_thread.start()
 	def brk(stream): pass # For eventual deinitialization, will only be called once.
 	return {
 		0x00: nop,
