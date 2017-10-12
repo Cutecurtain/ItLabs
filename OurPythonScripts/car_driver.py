@@ -32,7 +32,9 @@ def instr():
 	def mov(stream): g.outspeedcm = stream(signed=True)
 	def trn(stream): g.steering = stream(signed=True)
 	def acc(stream): is_acc.set() if stream() else is_acc.clear()
-	def brk(stream): pass # For eventual deinitialization, will only be called once per thread.
+	def brk(stream):
+		is_acc.clear()
+		g.outspeedcm = 0
 	return {
 		0x00: nop,
 		0x01: mov,
