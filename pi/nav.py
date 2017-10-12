@@ -528,7 +528,7 @@ def keepspeed():
             spi = int(desiredspeed_abs/10)
             if spi > len(speeds)-1:
                 spi = len(speeds)-1
-            sleeptime = 1
+            sleeptime = 0.025
         else:
             sleeptime = 3
 
