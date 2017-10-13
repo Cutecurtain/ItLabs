@@ -1,10 +1,9 @@
 from nav import g
 from sensor_logic import get_filtered_sensor_value
 from distance_logic import optimal_speed
-from time import sleep
 
-#adjusts the car speed based on current distance and current speed
 def adjust_to_optimal_speed():
+    """adjut car speed based on current distance and current speed"""
     current_distance = get_filtered_sensor_value()
     print(current_distance)
     if current_distance != None:
