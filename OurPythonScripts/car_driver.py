@@ -6,6 +6,7 @@ import time
 is_acc = threading.Event()
 
 def run():
+	"""Start listening for clients."""
 	try:
 		server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server_socket.bind(("", 3000))
@@ -18,6 +19,7 @@ def run():
 		print(e, file=stderr)
 
 def new_client(client_socket):
+	"""Register a new client."""
 	def run(client_socket):
 		stream = SocketStream(client_socket)
 		for op in stream:
@@ -45,6 +47,7 @@ def instr():
 instr = instr() # This design serves to keep the functions out of the global namespace.
 
 def accSpeed():
+	"""Adjust speed while ACC (Adaptive Cruise Control) is enabled."""
 	print("I live!")
 	print(is_acc)
 	while True:
