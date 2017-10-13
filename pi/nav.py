@@ -358,7 +358,7 @@ def heartbeat():
             if g.limitspeed0 == "notset":
                 tolog("setting speed to 0 during network pause")
                 g.limitspeed0 = g.limitspeed
-                g.limitspeed = 0.0
+                #g.limitspeed = 0.0
 
         if g.heartn-g.heartn_r < 2:
             if g.limitspeed0 != "notset":
