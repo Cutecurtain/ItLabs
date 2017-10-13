@@ -1,26 +1,16 @@
 from statistics import median
 from nav import g
 
-#minimum distance for the distance sensor
-min_dist = 0.10
-
-#maximum distance for the distance sensor
-max_dist = 2
-
-#method for filetering values out of bounds
-def filter_faulty_values(value):
+def filter_faulty_values(value, *, min_dist=0.10, max_dist=2):
+	"""Filter out values out of bounds."""
 	if min_dist < value < max_dist:
 		return value
 	return None
 
-
-#number of values to calculate median from
-median_range = 1000
-
-#returns a median of a from the distance sensor
-def get_filtered_sensor_value():
+def get_filtered_sensor_value(range=1000):
+	"""Return a median from the distance sensor."""
 	values = []
-	for i in range(median_range):
+	for i in range(range):
 		value = filter_faulty_values(g.can_ultra)
 		if value != None:
 			values.append(value)
