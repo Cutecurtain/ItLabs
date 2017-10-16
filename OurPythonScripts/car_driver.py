@@ -24,6 +24,7 @@ def new_client(client_socket):
 		stream = SocketStream(client_socket)
 		for op in stream:
 			instr[op](stream)
+		instr[0xFF](stream)
 	client_thread = threading.Thread(target=run, args=(client_socket,))
 	client_thread.run()
 	return client_thread
@@ -35,6 +36,7 @@ def instr():
 	def trn(stream): g.steering = stream(signed=True)
 	def acc(stream): is_acc.set() if stream() else is_acc.clear()
 	def brk(stream):
+		print("brk")
 		is_acc.clear()
 		g.outspeedcm = 0
 	return {
@@ -48,8 +50,6 @@ instr = instr() # This design serves to keep the functions out of the global nam
 
 def accSpeed():
 	"""Adjust speed while ACC (Adaptive Cruise Control) is enabled."""
-	print("I live!")
-	print(is_acc)
 	while True:
 		is_acc.wait()
 		adjust_to_optimal_speed()
@@ -62,6 +62,7 @@ class SocketStream:
 	def __init__(self, client):
 		self.client = client
 		self.active = True
+		self.nop_count = 0
 
 	def __call__(self, *, size=1, signed=False, endian="big"):
 		return int.from_bytes(self.client.recv(size), endian, signed=signed)
@@ -69,7 +70,9 @@ class SocketStream:
 	def __next__(self):
 		if not self.active: raise StopIteration
 		r = self(signed=False)
-		if r == 0xFF: self.active = False
+		if r == 0xFF or self.nop_count >= 128: self.active = False
+		elif r == 0x00: self.nop_count += 1
+		else: self.nop_count = 0
 		return r
 
 	def __iter__(self):
