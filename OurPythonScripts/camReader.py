@@ -262,7 +262,7 @@ def analyseImage():
 
 
 def main():
-    markerf = open("/tmp/marker0", "w")
+    #markerf = open("/tmp/marker0", "w")
     ## Set up logging
     #logging.basicConfig(filename="optipos.log", filemode="w", level=logging.DEBUG, format="%(asctime)s %(message)s")
     #logger = logging.getLogger(__name__)
