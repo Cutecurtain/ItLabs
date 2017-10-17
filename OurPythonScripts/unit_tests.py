@@ -4,7 +4,7 @@ from sensor_logic import get_filtered_sensor_value
 from speed_controll import adjust_to_optimal_speed
 
 def test_sensor_filter():
-    g.can_ultra = None
+    g.can_ultra = -200
     assert get_filtered_sensor_value() == None
     g.can_ultra = 1
     assert get_filtered_sensor_value() == 1
@@ -18,13 +18,13 @@ def test_optimal_speed():
 def test_speed_control():
     g.can_ultra = 2
     adjust_to_optimal_speed()
-    assert g.outspeedcm == 40
-    g.can_ultra = 0.2
+    assert g.outspeedcm <= 40
+    g.can_ultra = 0.11
     adjust_to_optimal_speed()
     assert g.outspeedcm >= 20
-    g.can_ultra = None
+    g.can_ultra = -200
     adjust_to_optimal_speed()
-    assert g.outspeed = 0
+    assert g.outspeed == 0
 
 test_optimal_speed()
 test_sensor_filter()
