@@ -1,6 +1,6 @@
 
+#returns optimal speed based on current distance to car in front
 def optimal_speed(current_distance):
-	"""Return optimal speed based on current distance to car in front."""
 	speed = current_distance * 100 - 100
 	if (speed > 40):
 		speed = 40
