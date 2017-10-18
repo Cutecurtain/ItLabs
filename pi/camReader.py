@@ -173,7 +173,7 @@ def isColour(pixelColour,targetColour):
     redDiff = abs(pixelColour[0] - targetColour[0])
     greenDiff = abs(pixelColour[1] - targetColour[1])
     blueDiff = abs(pixelColour[2] - targetColour[2])
-    if(redDiff < 50 and greenDiff < 50 and blueDiff < 50):
+    if(redDiff < 70 and greenDiff < 70 and blueDiff < 70):
         return True
     else: return False
 
@@ -182,7 +182,7 @@ def isGreen(pixelColour):
     return isColour(pixelColour,green)
 
 def isRed(pixelColour):
-    red = (241,91,129)
+    red = (0,0,0)
     return isColour(pixelColour, red)
 
 def isBlue(pixelColour):
@@ -190,8 +190,13 @@ def isBlue(pixelColour):
     return isColour(pixelColour, blue)
 
 def isWhite(pixelColour):
-    white = (241,246,240)
-    return isColour(pixelColour,white)
+    delta = 20
+    if abs(pixelColour[0] - pixelColour[1]) <= delta and abs(pixelColour[0] - pixelColour[2]) <= delta and abs(pixelColour[1] - pixelColour[2]) <= delta:
+        if pixelColour[0] >= 50:
+	        return True
+    return False
+         
+    #return isColour(pixelColour,white)
 
 def isBlack(pixelColour):
     black = (0,0,0)
@@ -242,7 +247,7 @@ def getRedBorders(list, greenStartIndex):
     leftborder += 1
     return (leftborder,rightborder)
 
-dx = 1
+dx = 4
 
 
 #def analyseImage():
@@ -281,28 +286,31 @@ def analyseImage1():
     height = t[1]
     middle = width * height // 2
     print(imList[middle])
+    start = time.time()
     for x in range(middle, 0, -dx):
         if (isRed(imList[x])):
             redBorders = getRedBorders(imList, x)
             rw = redBorders[1] - redBorders[0]
-            x -= rw
+            x = redBorders[0]
             #print(rw)
             redCenter = redBorders[0] + rw // 2
             if (checkColourCode1(rw, redCenter, imList)):
                 return (redCenter % width) / width
+            if time.time() - start > 3: break
     for x in range(middle, width * height - 1, dx):
         if (isRed(imList[x])):
             redBorders = getRedBorders(imList, x)
             rw = redBorders[1] - redBorders[0]
-            x += rw
+            x = redBorders[1]
             #print(rw)
             redCenter = redBorders[0] + rw // 2
             if (checkColourCode1(rw, redCenter, imList)):
                 return (redCenter % width) / width
+            if time.time() - start > 6: break
 
+image_value = 0.0
 
-
-def main():
+def main(thread_event):
     markerf = open("/tmp/marker0", "w")
     ## Set up logging
     #logging.basicConfig(filename="optipos.log", filemode="w", level=logging.DEBUG, format="%(asctime)s %(message)s")
@@ -347,21 +355,32 @@ def main():
         response = None
         # Construct a stream to hold image data temporarily (we could write it directly to connection but in this
         # case we want to find out the size of each capture first to keep the protocol simple)
+        #counter = 0
         for _ in camera.capture_continuous("/dev/shm/optiposimage.jpg", 'jpeg', use_video_port=True, quality=10):
+            #import shutil
+            #shutil.copy("/dev/shm/optiposimage.jpg", "/home/pi/java/image_" + str(counter) + ".jpg")
+            #counter += 1
+            if thread_event != None:
+                thread_event.wait()
             try:
                 # Get the start time, to be able to calculate response time
                 start = time.time()
                 response = analyseImage1()
                 end = time.time()
                 print('Received [' + str(response) + '] after ' + str(end - start) + ' s')
+                print("actual image_value:", str(image_value))
+                if response != None:
+                    global image_value
+                    image_value = response * 100
 
                 # If the response is a valid position, write it to CAN, else do nothing
 
             except Exception as e:
                 # Catch all exceptions, and print them to the log. Then continue taking more pictures
                 print(str(e))
+                #return None
 
 
 
 if __name__ == '__main__':
-    main()
+    main(None)
