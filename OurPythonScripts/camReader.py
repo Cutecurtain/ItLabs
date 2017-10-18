@@ -203,10 +203,10 @@ def checkColourCode(colourWidth, centerColour, imageList):
     isColourCodeCorrect = isBlueFound and isRedFound
     return isColourCodeCorrect
 
-def checkColourCode2(colourWidth, centerColour, imageList):
-    isBlackRightFound = isBlack(imageList[centerColour + colourWidth])
-    isBlackLeftFound = isBlack(imageList[centerColour - colourWidth])
-    isColourCodeCorrect = isBlackRightFound and isBlackLeftFound
+def checkColourCode1(colourWidth, centerColour, imageList):
+    isWhiteRightFound = isWhite(imageList[centerColour + colourWidth])
+    isWhiteLeftFound = isWhite(imageList[centerColour - colourWidth])
+    isColourCodeCorrect = isWhiteRightFound and isWhiteLeftFound
     return isColourCodeCorrect
 
 def getGreenBorders(list, greenStartIndex):
@@ -231,38 +231,79 @@ def getWhiteBorders(list, greenStartIndex):
     leftborder += 1
     return (leftborder,rightborder)
 
+def getRedBorders(list, greenStartIndex):
+    rightborder = greenStartIndex
+    leftborder = greenStartIndex
+    while isRed(list[rightborder]):
+        rightborder += 1
+
+    while isRed(list[leftborder]):
+        leftborder -= 1
+    leftborder += 1
+    return (leftborder,rightborder)
+
 dx = 1
 
 
-def analyseImage():
-    im = Image.open('"/dev/shm/optiposimage.jpg"')
+#def analyseImage():
+#    im = Image.open("/dev/shm/optiposimage.jpg")
+#    #im = im.convert("RGBA")
+#    im.load()
+#    imList = list(im.getdata())
+#    middle = im.width * im.height // 2
+#    print(imList[middle])
+#    for x in range(middle, 0, -dx):
+#        if (isGreen(imList[x])):
+#            greenBorders = getGreenBorders(imList, x)
+#            gw = greenBorders[1] - greenBorders[0]
+#            x += gw
+#            print(gw)
+#            greenCenter = greenBorders[0] + gw // 2
+#            if (checkColourCode(gw, greenCenter, imList)):
+#                return (greenCenter % im.width) / im.width
+#    for x in range(middle, im.width * im.height - 1, dx):
+#        if (isGreen(imList[x])):
+#            greenBorders = getGreenBorders(imList, x)
+#            gw = greenBorders[1] - greenBorders[0]
+#            x += gw
+#            print(gw)
+#            greenCenter = greenBorders[0] + gw // 2
+#            if (checkColourCode(gw, greenCenter, imList)):
+#                return (greenCenter % im.width) / im.width
+
+def analyseImage1():
+    im = Image.open("/dev/shm/optiposimage.jpg")
     #im = im.convert("RGBA")
     im.load()
     imList = list(im.getdata())
-    middle = im.width * im.height // 2
+    t = im.size
+    width = t[0]
+    height = t[1]
+    middle = width * height // 2
     print(imList[middle])
     for x in range(middle, 0, -dx):
-        if (isGreen(imList[x])):
-            greenBorders = getGreenBorders(imList, x)
-            gw = greenBorders[1] - greenBorders[0]
-            x += gw
-            print(gw)
-            greenCenter = greenBorders[0] + gw // 2
-            if (checkColourCode(gw, greenCenter, imList)):
-                return (greenCenter % im.width) / im.width
-    for x in range(middle, im.width * im.height - 1, dx):
-        if (isGreen(imList[x])):
-            greenBorders = getGreenBorders(imList, x)
-            gw = greenBorders[1] - greenBorders[0]
-            x += gw
-            print(gw)
-            greenCenter = greenBorders[0] + gw // 2
-            if (checkColourCode(gw, greenCenter, imList)):
-                return (greenCenter % im.width) / im.width
+        if (isRed(imList[x])):
+            redBorders = getRedBorders(imList, x)
+            rw = redBorders[1] - redBorders[0]
+            x -= rw
+            print(rw)
+            redCenter = redBorders[0] + rw // 2
+            if (checkColourCode1(rw, redCenter, imList)):
+                return (redCenter % width) / width
+    for x in range(middle, width * height - 1, dx):
+        if (isRed(imList[x])):
+            redBorders = getRedBorders(imList, x)
+            rw = redBorders[1] - redBorders[0]
+            x += rw
+            print(rw)
+            redCenter = redBorders[0] + rw // 2
+            if (checkColourCode1(rw, redCenter, imList)):
+                return (redCenter % width) / width
+
 
 
 def main():
-    #markerf = open("/tmp/marker0", "w")
+    markerf = open("/tmp/marker0", "w")
     ## Set up logging
     #logging.basicConfig(filename="optipos.log", filemode="w", level=logging.DEBUG, format="%(asctime)s %(message)s")
     #logger = logging.getLogger(__name__)
@@ -310,7 +351,7 @@ def main():
             try:
                 # Get the start time, to be able to calculate response time
                 start = time.time()
-                response = analyseImage()
+                response = analyseImage1()
                 end = time.time()
                 print('Received [' + response + '] after ' + str(end - start) + ' s')
 
@@ -318,7 +359,7 @@ def main():
 
             except Exception as e:
                 # Catch all exceptions, and print them to the log. Then continue taking more pictures
-                e.print
+                print("fel")
 
 
 
