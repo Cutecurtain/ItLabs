@@ -38,8 +38,8 @@ def readvin():
 g.VIN = readvin()
 print("VIN %s" % g.VIN)
 
-if not g.simulate:
-    import nav_imu
+#if not g.simulate:
+#    import nav_imu
 
 g.standalone = True
 g.standalone = False
@@ -63,8 +63,8 @@ import driving
 from math import pi, cos, sin, sqrt, atan2, acos, asin, log
 
 
-if not g.simulate:
-    nav_imu.g = g
+#if not g.simulate:
+#    nav_imu.g = g
 nav_log.g = g
 nav_mqtt.g = g
 nav_tc.g = g
@@ -261,8 +261,8 @@ g.tctime = None
 
 wm.wminit()
 nav1.nav1init()
-if not g.simulate:
-    nav_imu.imuinit()
+#if not g.simulate:
+#    nav_imu.imuinit()
 if not g.simulate:
     nav_mqtt.mqttinit()
 else:
@@ -358,7 +358,7 @@ def heartbeat():
             if g.limitspeed0 == "notset":
                 tolog("setting speed to 0 during network pause")
                 g.limitspeed0 = g.limitspeed
-                g.limitspeed = 0.0
+                #g.limitspeed = 0.0
 
         if g.heartn-g.heartn_r < 2:
             if g.limitspeed0 != "notset":
@@ -458,8 +458,8 @@ def init():
 
     tolog("init")
 
-    if not g.simulate:
-        nav_imu.calibrate_imu()
+#    if not g.simulate:
+#        nav_imu.calibrate_imu()
 
     if not g.simulate:
         start_new_thread(wm.readmarker, ())
@@ -467,8 +467,8 @@ def init():
     start_new_thread(nav_mqtt.handle_mqtt, ())
     if not g.simulate:
         start_new_thread(wm.readspeed2, ())
-    if not g.simulate:
-        start_new_thread_really(nav_imu.readgyro, ())
+#    if not g.simulate:
+#        start_new_thread_really(nav_imu.readgyro, ())
     if not g.simulate:
         start_new_thread(driving.senddrive, ())
     if not g.simulate:
@@ -528,7 +528,7 @@ def keepspeed():
             spi = int(desiredspeed_abs/10)
             if spi > len(speeds)-1:
                 spi = len(speeds)-1
-            sleeptime = 1
+            sleeptime = 0.025
         else:
             sleeptime = 3
 
