@@ -19,9 +19,9 @@ def test_speed_control():
     g.can_ultra = 2
     adjust_to_optimal_speed()
     assert g.outspeedcm <= 40
-    g.can_ultra = 0.11
+    g.can_ultra = 1.1
     adjust_to_optimal_speed()
-    assert g.outspeedcm >= 20
+    assert g.outspeedcm == 20
     g.can_ultra = -200
     adjust_to_optimal_speed()
     assert g.outspeed == 0
