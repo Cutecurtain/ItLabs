@@ -169,38 +169,47 @@ import struct
 #    except socket.error:
 #        print("Error writing vehicle position to CAN")
 
-def isColour(pixelColour,targetColour):
+def isColour(pixelColour, targetColour):
     redDiff = abs(pixelColour[0] - targetColour[0])
     greenDiff = abs(pixelColour[1] - targetColour[1])
     blueDiff = abs(pixelColour[2] - targetColour[2])
-    if(redDiff < 70 and greenDiff < 70 and blueDiff < 70):
+    if (redDiff < 70 and greenDiff < 70 and blueDiff < 70):
         return True
-    else: return False
+    else:
+        return False
+
 
 def isGreen(pixelColour):
-    green = (0,255,0)
-    return isColour(pixelColour,green)
+    green = (0, 255, 0)
+    return isColour(pixelColour, green)
+
 
 def isRed(pixelColour):
-    red = (0,0,0)
-    return isColour(pixelColour, red)
+    if pixelColour[0] > 160 and pixelColour[1] < 110 and pixelColour[2] <= 80:
+        return True
+    return False
+
 
 def isBlue(pixelColour):
-    blue = (0,0,255)
+    blue = (0, 0, 255)
     return isColour(pixelColour, blue)
 
+
 def isWhite(pixelColour):
-    delta = 20
-    if abs(pixelColour[0] - pixelColour[1]) <= delta and abs(pixelColour[0] - pixelColour[2]) <= delta and abs(pixelColour[1] - pixelColour[2]) <= delta:
-        if pixelColour[0] >= 50:
-	        return True
+    delta = 100
+    if abs(pixelColour[0] - pixelColour[1]) <= delta and abs(pixelColour[0] - pixelColour[2]) <= delta and abs(
+                    pixelColour[1] - pixelColour[2]) <= delta:
+        if pixelColour[0] >= 120:
+            return True
     return False
-         
-    #return isColour(pixelColour,white)
+
+    # return isColour(pixelColour,white)
+
 
 def isBlack(pixelColour):
-    black = (0,0,0)
-    return isColour(pixelColour,black)
+    black = (0, 0, 0)
+    return isColour(pixelColour, black)
+
 
 def checkColourCode(colourWidth, centerColour, imageList):
     isBlueFound = isBlue(imageList[centerColour + colourWidth])
@@ -208,11 +217,13 @@ def checkColourCode(colourWidth, centerColour, imageList):
     isColourCodeCorrect = isBlueFound and isRedFound
     return isColourCodeCorrect
 
+
 def checkColourCode1(colourWidth, centerColour, imageList):
     isWhiteRightFound = isWhite(imageList[centerColour + colourWidth])
     isWhiteLeftFound = isWhite(imageList[centerColour - colourWidth])
     isColourCodeCorrect = isWhiteRightFound and isWhiteLeftFound
     return isColourCodeCorrect
+
 
 def getGreenBorders(list, greenStartIndex):
     rightborder = greenStartIndex
@@ -223,7 +234,8 @@ def getGreenBorders(list, greenStartIndex):
     while isGreen(list[leftborder]):
         leftborder -= 1
     leftborder += 1
-    return (leftborder,rightborder)
+    return (leftborder, rightborder)
+
 
 def getWhiteBorders(list, greenStartIndex):
     rightborder = greenStartIndex
@@ -234,7 +246,8 @@ def getWhiteBorders(list, greenStartIndex):
     while isWhite(list[leftborder]):
         leftborder -= 1
     leftborder += 1
-    return (leftborder,rightborder)
+    return (leftborder, rightborder)
+
 
 def getRedBorders(list, greenStartIndex):
     rightborder = greenStartIndex
@@ -245,12 +258,13 @@ def getRedBorders(list, greenStartIndex):
     while isRed(list[leftborder]):
         leftborder -= 1
     leftborder += 1
-    return (leftborder,rightborder)
-
-dx = 4
+    return (leftborder, rightborder)
 
 
-#def analyseImage():
+dx = 9
+
+
+# def analyseImage():
 #    im = Image.open("/dev/shm/optiposimage.jpg")
 #    #im = im.convert("RGBA")
 #    im.load()
@@ -277,8 +291,8 @@ dx = 4
 #                return (greenCenter % im.width) / im.width
 
 def analyseImage1():
-    im = Image.open("/dev/shm/optiposimage.jpg")
-    #im = im.convert("RGBA")
+    im = Image.open("pics/WIN_20171018_20_34_08_Pro.jpg")
+    # im = im.convert("RGBA")
     im.load()
     imList = list(im.getdata())
     t = im.size
@@ -291,22 +305,23 @@ def analyseImage1():
         if (isRed(imList[x])):
             redBorders = getRedBorders(imList, x)
             rw = redBorders[1] - redBorders[0]
-            x = redBorders[0]
-            #print(rw)
-            redCenter = redBorders[0] + rw // 2
-            if (checkColourCode1(rw, redCenter, imList)):
-                return (redCenter % width) / width
+            if(rw > 20):
+                print(rw)
+                redCenter = redBorders[0] + rw // 2
+                if (checkColourCode1(rw, redCenter, imList)):
+                    return (redCenter % width) / width
             if time.time() - start > 3: break
     for x in range(middle, width * height - 1, dx):
         if (isRed(imList[x])):
             redBorders = getRedBorders(imList, x)
             rw = redBorders[1] - redBorders[0]
-            x = redBorders[1]
-            #print(rw)
-            redCenter = redBorders[0] + rw // 2
-            if (checkColourCode1(rw, redCenter, imList)):
-                return (redCenter % width) / width
+            if(rw > 20):
+                print(rw)
+                redCenter = redBorders[0] + rw // 2
+                if (checkColourCode1(rw, redCenter, imList)):
+                    return (redCenter % width) / width
             if time.time() - start > 6: break
+
 
 image_value = 0.0
 
