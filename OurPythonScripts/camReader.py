@@ -286,7 +286,7 @@ def analyseImage1():
             redBorders = getRedBorders(imList, x)
             rw = redBorders[1] - redBorders[0]
             x -= rw
-            print(rw)
+            #print(rw)
             redCenter = redBorders[0] + rw // 2
             if (checkColourCode1(rw, redCenter, imList)):
                 return (redCenter % width) / width
@@ -295,7 +295,7 @@ def analyseImage1():
             redBorders = getRedBorders(imList, x)
             rw = redBorders[1] - redBorders[0]
             x += rw
-            print(rw)
+            #print(rw)
             redCenter = redBorders[0] + rw // 2
             if (checkColourCode1(rw, redCenter, imList)):
                 return (redCenter % width) / width
