@@ -182,7 +182,7 @@ def isGreen(pixelColour):
     return isColour(pixelColour,green)
 
 def isRed(pixelColour):
-    red = (255,0,0)
+    red = (241,91,129)
     return isColour(pixelColour, red)
 
 def isBlue(pixelColour):
@@ -190,7 +190,7 @@ def isBlue(pixelColour):
     return isColour(pixelColour, blue)
 
 def isWhite(pixelColour):
-    white = (255,255,255)
+    white = (241,246,240)
     return isColour(pixelColour,white)
 
 def isBlack(pixelColour):
