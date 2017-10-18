@@ -1,6 +1,7 @@
 import socket
 import threading
 from speed_controll import adjust_to_optimal_speed
+from camReader import main as image_analyzer
 import time
 
 is_acc = threading.Event()
@@ -48,6 +49,12 @@ def instr():
 	}
 instr = instr() # This design serves to keep the functions out of the global namespace.
 
+def steer():
+	from nav import g
+	steer_value = -(30 + math.floor(iv)) * 2
+	print("New steer value:", str(steer_value))
+	g.steering = steer_value
+
 def accSpeed():
 	"""Adjust speed while ACC (Adaptive Cruise Control) is enabled."""
 	while True:
@@ -55,8 +62,26 @@ def accSpeed():
 		adjust_to_optimal_speed()
 		time.sleep(0.1)
 
-acc_thread = threading.Thread(target=accSpeed)
-acc_thread.start()
+def accImage():
+	"""Take pictures with camera while ACC (Adaptive Cruise Control) is enabled."""
+	analyze_image(is_acc)
+
+def accSteer():
+	"""Adjust steering while ACC (Adaptive Cruise Control) is enabled."""
+	while True:
+		from camReader import image_value as nv
+		is_acc.wait()
+		#print("Cam_value:", str(iv))
+		if iv != None:
+			steer()
+		time.sleep(0.5)
+
+acc_thread_speed = threading.Thread(target=accSpeed)
+acc_thread_image = threading.Thread(target=accImage)
+acc_thread_steer = threading.Thread(target=accSteer)
+acc_thread_speed.start()
+acc_thread_image.start()
+acc_thread_steer.start()
 
 class SocketStream:
 	def __init__(self, client):
