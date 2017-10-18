@@ -7,10 +7,10 @@ def filter_faulty_values(value, *, min_dist=0.10, max_dist=2):
 		return value
 	return None
 
-def get_filtered_sensor_value(range=1000):
+def get_filtered_sensor_value(filter_size=1000):
 	"""Return a median from the distance sensor."""
 	values = []
-	for i in range(range):
+	for i in range(filter_size):
 		value = filter_faulty_values(g.can_ultra)
 		if value != None:
 			values.append(value)
