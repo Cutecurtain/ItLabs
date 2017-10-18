@@ -353,13 +353,13 @@ def main():
                 start = time.time()
                 response = analyseImage1()
                 end = time.time()
-                print('Received [' + response + '] after ' + str(end - start) + ' s')
+                print('Received [' + str(response) + '] after ' + str(end - start) + ' s')
 
                 # If the response is a valid position, write it to CAN, else do nothing
 
             except Exception as e:
                 # Catch all exceptions, and print them to the log. Then continue taking more pictures
-                print("fel")
+                print(str(e))
 
 
 
