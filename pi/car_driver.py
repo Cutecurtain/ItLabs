@@ -3,6 +3,7 @@ import threading
 from speed_controll import adjust_to_optimal_speed
 from camReader import main as image_analyzer
 import time
+import math
 
 is_acc = threading.Event()
 
@@ -51,9 +52,10 @@ instr = instr() # This design serves to keep the functions out of the global nam
 
 def steer():
 	from nav import g
-	steer_value = -(30 + math.floor(ivContainer[0])) * 2
+	steer_value = (30 + math.floor(ivContainer[0])) * 2
 	print("New steer value:", str(steer_value))
 	g.steering = steer_value
+	#g.outspeedcm = 20
 
 def accSpeed():
 	"""Adjust speed while ACC (Adaptive Cruise Control) is enabled."""

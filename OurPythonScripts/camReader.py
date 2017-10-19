@@ -185,7 +185,7 @@ def isGreen(pixelColour):
 
 
 def isRed(pixelColour):
-    if pixelColour[0] > 160 and pixelColour[1] < 115 and pixelColour[2] < 170:
+    if pixelColour[0] > pixelColour[2] > pixelColour[1] and pixelColour[0] > 90:
         return True
     return False
 
@@ -291,7 +291,7 @@ dx = 9
 #                return (greenCenter % im.width) / im.width
 
 def analyseImage1():
-    im = Image.open("pics/WIN_20171018_20_34_08_Pro.jpg")
+    im = Image.open("/dev/shm/optiposimage.jpg")
     # im = im.convert("RGBA")
     im.load()
     imList = list(im.getdata())
@@ -306,7 +306,7 @@ def analyseImage1():
             redBorders = getRedBorders(imList, x)
             rw = redBorders[1] - redBorders[0]
             if(rw > 20):
-                print(rw)
+                #print(rw)
                 redCenter = redBorders[0] + rw // 2
                 if (checkColourCode1(rw, redCenter, imList)):
                     return (redCenter % width) / width
@@ -316,7 +316,7 @@ def analyseImage1():
             redBorders = getRedBorders(imList, x)
             rw = redBorders[1] - redBorders[0]
             if(rw > 20):
-                print(rw)
+                #print(rw)
                 redCenter = redBorders[0] + rw // 2
                 if (checkColourCode1(rw, redCenter, imList)):
                     return (redCenter % width) / width
@@ -397,4 +397,4 @@ def main(thread_event,ivContainer):
 
 
 if __name__ == '__main__':
-    main(None)
+    main(None, None)

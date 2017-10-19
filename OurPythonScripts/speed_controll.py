@@ -5,7 +5,7 @@ from distance_logic import optimal_speed
 def adjust_to_optimal_speed():
     """Adjut car speed based on current distance and current speed."""
     current_distance = get_filtered_sensor_value()
-    print(current_distance)
+    #print(str(current_distance))
     if current_distance != None:
         new_speed = optimal_speed(current_distance)
         if 0 < new_speed < 20:
