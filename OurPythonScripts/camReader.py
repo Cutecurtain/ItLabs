@@ -185,7 +185,7 @@ def isGreen(pixelColour):
 
 
 def isRed(pixelColour):
-    if pixelColour[0] > 160 and pixelColour[1] < 110 and pixelColour[2] <= 80:
+    if pixelColour[0] > 160 and pixelColour[1] < 115 and pixelColour[2] < 170:
         return True
     return False
 
@@ -325,7 +325,7 @@ def analyseImage1():
 
 image_value = 0.0
 
-def main(thread_event):
+def main(thread_event,ivContainer):
     markerf = open("/tmp/marker0", "w")
     ## Set up logging
     #logging.basicConfig(filename="optipos.log", filemode="w", level=logging.DEBUG, format="%(asctime)s %(message)s")
@@ -385,8 +385,7 @@ def main(thread_event):
                 print('Received [' + str(response) + '] after ' + str(end - start) + ' s')
                 print("actual image_value:", str(image_value))
                 if response != None:
-                    global image_value
-                    image_value = response * 100
+                    ivContainer[0] = response * 100
 
                 # If the response is a valid position, write it to CAN, else do nothing
 

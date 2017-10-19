@@ -185,7 +185,7 @@ def isGreen(pixelColour):
 
 
 def isRed(pixelColour):
-    if pixelColour[0] > 160 and pixelColour[1] < 110 and pixelColour[2] <= 80:
+    if pixelColour[0] > 160 and pixelColour[1] < 115 and pixelColour[2] < 170:
         return True
     return False
 
