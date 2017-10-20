@@ -1,9 +1,6 @@
-package se.sics.sse.fresta.wirelessino;
+package wirelessino;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.Socket;
 
 import android.os.Bundle;
@@ -12,8 +9,10 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import se.sics.sse.fresta.wirelessino.R;
+
 public class Main extends Activity {
-	public static final String TAG = "WirelessIno";
+	public static final String TAG = "ItLabsApp";
 	public static Socket socket = null;
 	public static final boolean D = true; // The debug option
 	
@@ -70,6 +69,9 @@ public class Main extends Activity {
 				if (socket != null) {
 					socket.close();
 					socket = null;
+
+					mopedStream.close();
+					mopedStream.acc(false);
 					
 					menu.getItem(DISCONNECT_INDEX).setVisible(false); // Hide the disconnect option
 					view.invalidate(); // Repaint (to show "not connected" in the main view)

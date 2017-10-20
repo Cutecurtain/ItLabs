@@ -1,4 +1,4 @@
-package se.sics.sse.fresta.wirelessino;
+package wirelessino;
 public class Options {
 
 	private static Options instance;

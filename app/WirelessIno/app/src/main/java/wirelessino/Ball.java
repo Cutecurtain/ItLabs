@@ -1,4 +1,4 @@
-package se.sics.sse.fresta.wirelessino;
+package wirelessino;
 
 import android.graphics.Rect;
 

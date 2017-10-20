@@ -1,8 +1,7 @@
-package se.sics.sse.fresta.wirelessino;
+package wirelessino;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,24 +17,25 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 
+import android.media.MediaPlayer;
+
 import android.content.pm.ActivityInfo;
 import android.app.Activity;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import java.io.IOException;
 import java.net.Socket;
 
+import se.sics.sse.fresta.wirelessino.R;
+
 public class PadView extends SurfaceView implements Callback, Runnable {
 	private boolean run;
 	private SurfaceHolder sh;
-	private Paint p, pRed, pBlue, pYellow, pControls;
+	private Paint p, p2, p3,  pRed, pBlue, pYellow, pControls;
 	public Ball balls[]   = new Ball[2];
-	private int touchX[]  = new int[balls.length], 
+	private int touchX[]  = new int[balls.length],
 				touchY[]  = new int[balls.length],
-				origenY[] = new int[balls.length], 
-				origenX[] = new int[balls.length], 
+				origenY[] = new int[balls.length],
+				origenX[] = new int[balls.length],
 				idMap[]   = new int[balls.length]; // pointerId depends on how many fingers are pressed and can exceed the number of balls. Thus, a mapping is needed.
 	private int textSize, w, h;
 	public Rect screen, bar1, bar2, notif;
@@ -43,14 +43,15 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 	private Bitmap bluinoBMP;
 	public static final int UMBRAL_TACTIL = 70;
 	private static String canTextL = "", canTextR = "";
-	public Rect myRec, urRec;
+	public Rect myRec;
 
+	private String accState = "ACC OFF";
 	private Activity host;
 
 	public PadView(Context context) {
 		super(context);
 		sh = getHolder();
-		sh.addCallback(this); 
+		sh.addCallback(this);
 	}
 
 
@@ -59,9 +60,22 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		p.setColor(Color.WHITE);
 		p.setTextAlign(Align.CENTER);
 		p.setTypeface(Typeface.createFromAsset(this.getContext().getAssets(),
-				"fonts/KellySlab-Regular.ttf"));
+				"fonts/futuraextended.ttf"));
 		p.setTextSize(textSize);
 		p.setAntiAlias(true);
+
+		p2 = new Paint();
+		p2.setColor(Color.RED);
+		p2.setTypeface(Typeface.createFromAsset(this.getContext().getAssets(), "fonts/futuraextended.ttf"));
+		p2.setTextSize(textSize);
+		p2.setAntiAlias(true);
+
+		p3 = new Paint();
+		p3.setColor(Color.GREEN);
+		p3.setTypeface(Typeface.createFromAsset(this.getContext().getAssets(), "fonts/futuraextended.ttf"));
+		p3.setTextSize(textSize);
+		p3.setAntiAlias(true);
+
 		pRed = new Paint();
 		pRed.setColor(Color.RED);
 		pRed.setAntiAlias(true);
@@ -79,30 +93,33 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 
 	public void onDraw(Canvas canvas) {
 		try {
-			canvas.drawColor(Color.DKGRAY);
+			canvas.drawColor(Color.GRAY);
+
 			if (Main.socket == null) {
-				canvas.drawCircle(getWidth() / 2, getHeight() / 8, balls[0]
-						.getRect().width() / 2, pRed);
 				canvas.drawText(
 						getContext().getString(R.string.title_not_connected),
-						screen.centerX(), (getHeight() / 8) + textSize * 2, p);
+						screen.centerX() - 200, (getHeight() / 8) + textSize * 2, p2);
 			} else if (Main.socket != null) {
-				canvas.drawCircle(screen.exactCenterX(), screen.height() / 8,
-						balls[0].getRect().width() / 2, pBlue);
 				canvas.drawText(getContext()
-						.getString(R.string.title_connected), screen.centerX(),
-						(getHeight() / 8) + textSize * 2, p);
+								.getString(R.string.title_connected), screen.centerX() - 200,
+						(getHeight() / 8) + textSize * 2, p3);
 			} else {
 				canvas.drawCircle(getWidth() / 2, getHeight() / 8, balls[0]
 						.getRect().width() / 2, pRed);
 				canvas.drawText(
 						getContext().getString(R.string.title_not_connected),
-						screen.centerX(), (getHeight() / 8) + textSize * 2, p);
+						screen.centerX() - 200, (getHeight() / 8) + textSize * 2, p2);
+
+
 			}
+
+			//canvas.drawText();
+			canvas.drawRect(myRec, pRed);
+
 			canvas.drawRect(bar1, p);
 			canvas.drawRect(bar2, p);
-			canvas.drawRect(myRec, pRed);
-			canvas.drawRect(urRec, pYellow);
+			//canvas.drawRect(myRec, pRed);
+			//canvas.drawRect(urRec, pYellow);
 			canvas.drawRect(balls[0].getRect(), pControls);
 			// canvas.drawCircle(balls[0].getRect().centerX(),
 			// balls[0].getRect().centerY(), balls[0].getRect().width() / 2,
@@ -115,11 +132,12 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 					6 * getHeight() / 8, null);
 
 			// Arndt: this will become a signalling button
-			canvas.drawCircle(getWidth() / 4, getHeight() / 8, balls[0]
-					  .getRect().width(), pYellow);
+			/*canvas.drawCircle(getWidth() / 4, getHeight() / 8, balls[0]
+					.getRect().width(), pYellow);*/
 
 
 			drawText(canvas, p);
+			drawColorRect(canvas, p);
 		} catch (Exception e) {
 			Log.e(Main.TAG, "onDraw - ", e);
 		}
@@ -130,6 +148,12 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 				7 * getHeight() / 8, paint);
 		canvas.drawText(canTextR, balls[1].getRect().centerX(),
 				7 * getHeight() / 8, paint);
+	}
+
+	private void drawColorRect(Canvas canvas, Paint paint){
+		//canvas.drawRect(myRec,paint);
+		canvas.drawText(accState,getWidth() - 300, getHeight() / 11,paint);
+		//notif.centerX() + 240
 	}
 
 	public Bitmap resizeImage(Context ctx, int resId, int w, int h) {
@@ -164,10 +188,6 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 
 	}
 
-	/*public void changeColour(Rect myRec){ change colour of button when pressed
-		drawRect(myRec, pYellow);
-	}*/
-
 
 
 	@SuppressLint("WrongCall")
@@ -191,17 +211,22 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 	}
 
 
-	
+
 	@SuppressLint("ClickableViewAccessibility")
 	public boolean onTouchEvent(MotionEvent event) {
 		int action = event.getAction() & MotionEvent.ACTION_MASK;
 		int pointerIndex = event.getActionIndex();
 		int pointerId = event.getPointerId(pointerIndex);
 
+
+
 		Socket socket = Main.socket;
 		MopedStream mopedStream = Main.mopedStream;
 
-		
+		final MediaPlayer AccOn = MediaPlayer.create(getContext(), R.raw.accon);
+		final MediaPlayer AccOff = MediaPlayer.create(getContext(), R.raw.accoff);
+
+
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
 			case MotionEvent.ACTION_POINTER_DOWN:
@@ -210,32 +235,35 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 							"+DragandDropVIEW OnTouchEvent(Action_Down) ID:"
 									+ pointerId + " - Index" + pointerIndex);
 				}
-				
+
 				int x = (int) event.getX(pointerIndex);
 				int y = (int) event.getY(pointerIndex);
-	
-				if (notif.contains(x, y)) {
-					if (Main.D)
-						Log.i(Main.TAG,
-								"+OnTouchEvent(Action_Down) SECREEETtouch!!; ");
-					/*if (Main.socket != null)
-						Main.send("S0008T0007");// secret code to run a
-														// secret routine in
-														// Arduino
-														*/
-				}
 
 
 				if(myRec.contains(x,y)) {
-					System.out.println("HEEEEJ!!");
-					if(mopedStream.getAccStatus){
-						mopedstream.acc(false);
-					}else{
-						mopedstream.acc(true);
+						turnOnAcc(mopedStream, socket);
+					if(socket!=null) {
+						/*if (mopedStream.getAccStatus()) { //if its already running (If its true)
+							try {
+								mopedStream.acc(false); // sätt den till false
+								accState = "ACC OFF";
+								AccOff.start();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						} else { //if its not (if its false)
+							try {
+								mopedStream.acc(true);
+								accState = "ACC ON";
+								AccOn.start();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}*/
 					}
 				}
 
-	
+
 				/* Check if a new ball should be activated */
 				for (int i=0; i<balls.length; i++) {
 					Rect aux = new Rect(balls[i].getRect());
@@ -249,39 +277,35 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 						origenY[i] = touchY[i] = y;
 					}
 				}
-				
+
 				break;
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_POINTER_UP:
 			case MotionEvent.ACTION_CANCEL:
-				/* If this was a finger that was not moving on a bar, 
+				/* If this was a finger that was not moving on a bar,
 				 * no need to adjust anything, just return */
 				int ballId = getBallId(pointerId);
 				if (ballId < 0)
 					return true;
-				
+
 				/* Reset */
 				touchX[ballId] = touchY[ballId] = -1;
 				idMap[ballId] = -1;
-				
+
 				if (idMap[0] == -1 && idMap[1] == -1) {
 				    host.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 				}
 
 				balls[ballId].moveToCenter();
 				try {
-					transformPWM();
+					//transformPWM(mopedStream, socket);
+					moveMoped(mopedStream, socket);
+					turnMoped(mopedStream, socket);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-//				if (balls[ballId].getmoveType() == Ball.RIGHT_BAR) {
-//					transformPWM(balls[ballId], bar2, Options
-//							.getInstance().getRBarValue());
-//				} else {
-//					transformPWM(balls[ballId], bar1, Options
-//							.getInstance().getLBarValue());
-//				}
-	
+//
+
 				if (Main.D)
 					Log.v(Main.TAG,
 							"+DragandDropVIEW OnTouchEvent(Action_Up) ID:"
@@ -289,19 +313,19 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 				break;
 			case MotionEvent.ACTION_MOVE:
 				int pointerCount = event.getPointerCount();
-	
+
 				for (int i = 0; i < pointerCount; i++) {
 					pointerIndex = i;
 					pointerId = event.getPointerId(pointerIndex);
-					
+
 					/* If this is a finger that is moving on a bar, just skip it */
 					ballId = getBallId(pointerId);
 					if (ballId < 0)
 						continue;
-					
+
 					touchX[ballId] = (int) event.getX(pointerIndex);
 					touchY[ballId] = (int) event.getY(pointerIndex);
-	
+
 					if (balls[ballId].getmoveType() == Ball.RIGHT_BAR) {
 						// lastWheelValue =
 						// Options.getInstance().getRBarValue();
@@ -313,12 +337,14 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 									- origenY[ballId]);
 
 							try {
-								transformPWM(mopedstream, socket); //balls[ballId], bar2, Options.getInstance().getRBarValue());
+								//transformPWM(mopedStream, socket); //balls[ballId], bar2, Options.getInstance().getRBarValue());
+								moveMoped(mopedStream, socket);
+								turnMoped(mopedStream, socket);
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
 						}
-	
+
 					} else if (balls[ballId].puedoMover(touchX[ballId]
 							- origenX[ballId], touchY[ballId]
 							- origenY[ballId], bar1)) {
@@ -327,7 +353,9 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 								- origenY[ballId]);
 
 						try {
-							transformPWM(); //balls[ballId], bar1, Options.getInstance().getLBarValue());
+							//transformPWM(mopedStream, socket); //balls[ballId], bar1, Options.getInstance().getLBarValue());
+							moveMoped(mopedStream, socket);
+							turnMoped(mopedStream, socket);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -339,42 +367,118 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 				}
 
 				break;
-			default:		
+			default:
 		}
-		
+
 		return true;
 	}
-	
-	/* 
+
+	/*
 	 * Checks if the pointerId corresponds to one of the Balls.
-	 * If not, -1 is returned.  
+	 * If not, -1 is returned.
 	 */
 	private int getBallId(int pointerId) {
 		for (int i=0; i<idMap.length; i++) {
 			if (idMap[i] == pointerId)
 				return i;
 		}
-		
+
 		return -1;
 	}
 
-	public synchronized void transformPWM(MopedStream mopedstream, Socket socket) throws IOException {
+	public void turnOnAcc(MopedStream mopedStream, Socket socket){
+
+		final MediaPlayer AccOn = MediaPlayer.create(getContext(), R.raw.accon);
+		final MediaPlayer AccOff = MediaPlayer.create(getContext(), R.raw.accoff);
+		if(socket!=null) {
+			if (mopedStream.getAccStatus()) { //if its already running (If its true)
+				try {
+					mopedStream.acc(false); // sätt den till false
+					accState = "ACC OFF";
+					AccOff.start();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else { //if its not (if its false)
+				try {
+					mopedStream.acc(true);
+					accState = "ACC ON";
+					AccOn.start();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public void turnMoped(MopedStream mopedStream, Socket socket) throws IOException {
+
 		double dist;
 		int x;
-		
-		/* Calc and output speed values using the left bar */ 
+
+		dist = balls[1].getRect().centerX() - bar2.left;
+		x = (int) Math.ceil((Options.getInstance().getRBarValue() / (bar2.width() / dist)) - 100);
+		if (x < 0)
+			x--;
+
+		double lambda = x/100.0;
+		if (lambda < 0)
+			lambda = -lambda;
+
+		double x2 = x*x/100.0;
+		if (x < 0)
+			x2 = -x2;
+
+		int x3 = (int) (lambda*x2 + (1-lambda)*x);
+
+
+		if (socket != null) {
+			canTextR = intToString(x3);
+			mopedStream.turn((byte) x3);
+		}
+
+	}
+
+	public void moveMoped(MopedStream mopedStream, Socket socket) throws IOException {
+		double dist;
+		int x;
+
 		dist = bar1.bottom - balls[0].getRect().centerY();
 		x = (int) Math.ceil((Options.getInstance().getLBarValue() / (bar1.height() / dist)) - 100);
 		if (x < 0)
 			x--;
 
-		if (socket != null) {
-			System.out.println(x);
-			mopedStream.move((byte) x);
+
+		if(accState.equals("ACC OFF")) {
+			if (socket != null) {
+				canTextL = intToString(x);
+				mopedStream.move((byte) x);
+			}
 		}
 
+	}
+
+	public synchronized void transformPWM(MopedStream mopedStream, Socket socket) throws IOException {
+		double dist;
+		int x;
+
+		/* Calc and output speed values using the left bar */
+		/*dist = bar1.bottom - balls[0].getRect().centerY();
+		x = (int) Math.ceil((Options.getInstance().getLBarValue() / (bar1.height() / dist)) - 100);
+		if (x < 0)
+			x--;
+
+
+		if(accState.equals("ACC OFF")) {
+			if (socket != null) {
+				canTextL = intToString(x);
+				System.out.println(x);
+				mopedStream.move((byte) x);
+			}
+		}*/
+
 		/* Calc and output steering values using the right bar */
-		dist = balls[1].getRect().centerX() - bar2.left;
+		/*dist = balls[1].getRect().centerX() - bar2.left;
 		x = (int) Math.ceil((Options.getInstance().getRBarValue() / (bar2.width() / dist)) - 100);
 		if (x < 0)
 			x--;
@@ -389,12 +493,11 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 
 		int x3 = (int) (lambda*x2 + (1-lambda)*x);
 
-		if(socket != null) {
-			mopedStream.turn((byte) x3);
-		}
 
-
-		/* Send speed and steering values through the socket */
+			if (socket != null) {
+				canTextR = intToString(x3);
+				mopedStream.turn((byte) x3);
+			}*/
 	}
 
 	private String intToString(int x) {
@@ -406,12 +509,12 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		x = Math.abs(x);
 		if (x < 100) {
 			padding += "0";
-		
+
 			if (x < 10) {
 				padding += "0";
 			}
 		}
-		
+
 		return padding + x;
 	}
 
@@ -442,11 +545,10 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		myRec = new Rect(50,50,(getWidth() - 50) /2,150);
 
 		//sends code to socket currently to 00 V YELLOW
-		urRec = new Rect(((getWidth()/2)),(getWidth()/8) + 10,getWidth() - 50, 50);
+		//urRec = new Rect(((getWidth()/2)),(getWidth()/8) + 10,getWidth() - 50, 50);
 
-		bluinoBMP = resizeImage(this.getContext(), R.drawable.transformer,
-				10 * w, 2 * getHeight() / 8);
-		
+		bluinoBMP = resizeImage(this.getContext(), R.drawable.logga2, getWidth() - 600, 8 * (getHeight() / 70) - 20);
+
 		for (int i=0; i<idMap.length; i++) {
 			idMap[i] = -1;
 		}
@@ -460,7 +562,7 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
- 
+
 	}
 
 	@Override

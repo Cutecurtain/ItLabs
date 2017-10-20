@@ -15,11 +15,11 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/it"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="se.sics.sse.fresta.wirelessino.Main"
+            android:name="wirelessino.Main"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SocketConnector"
+            android:name="wirelessino.SocketConnector"
             android:label="Target Server Setting" >
         </activity>
     </application>
