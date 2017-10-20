@@ -1,4 +1,4 @@
-package wirelessino;
+package itlabsapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -25,7 +25,8 @@ import android.app.Activity;
 import java.io.IOException;
 import java.net.Socket;
 
-import se.sics.sse.fresta.wirelessino.R;
+import src.main.java.itlabsapp.R;
+
 
 public class PadView extends SurfaceView implements Callback, Runnable {
 	private boolean run;
@@ -113,27 +114,21 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 
 			}
 
-			//canvas.drawText();
+
 			canvas.drawRect(myRec, pRed);
 
 			canvas.drawRect(bar1, p);
 			canvas.drawRect(bar2, p);
-			//canvas.drawRect(myRec, pRed);
-			//canvas.drawRect(urRec, pYellow);
+
 			canvas.drawRect(balls[0].getRect(), pControls);
-			// canvas.drawCircle(balls[0].getRect().centerX(),
-			// balls[0].getRect().centerY(), balls[0].getRect().width() / 2,
-			// pControls);
-			// canvas.drawRect(balls[1].getRect(),pControls);
+
 			canvas.drawCircle(balls[1].getRect().centerX(), balls[1].getRect()
 					.centerY(), balls[1].getRect().width() / 2, pControls);
 
 			canvas.drawBitmap(bluinoBMP, screen.centerX() - w * 7 / 2,
 					6 * getHeight() / 8, null);
 
-			// Arndt: this will become a signalling button
-			/*canvas.drawCircle(getWidth() / 4, getHeight() / 8, balls[0]
-					.getRect().width(), pYellow);*/
+
 
 
 			drawText(canvas, p);
@@ -151,9 +146,9 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 	}
 
 	private void drawColorRect(Canvas canvas, Paint paint){
-		//canvas.drawRect(myRec,paint);
+
 		canvas.drawText(accState,getWidth() - 300, getHeight() / 11,paint);
-		//notif.centerX() + 240
+
 	}
 
 	public Bitmap resizeImage(Context ctx, int resId, int w, int h) {
@@ -223,9 +218,6 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		Socket socket = Main.socket;
 		MopedStream mopedStream = Main.mopedStream;
 
-		final MediaPlayer AccOn = MediaPlayer.create(getContext(), R.raw.accon);
-		final MediaPlayer AccOff = MediaPlayer.create(getContext(), R.raw.accoff);
-
 
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
@@ -242,25 +234,6 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 
 				if(myRec.contains(x,y)) {
 						turnOnAcc(mopedStream, socket);
-					if(socket!=null) {
-						/*if (mopedStream.getAccStatus()) { //if its already running (If its true)
-							try {
-								mopedStream.acc(false); // sätt den till false
-								accState = "ACC OFF";
-								AccOff.start();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						} else { //if its not (if its false)
-							try {
-								mopedStream.acc(true);
-								accState = "ACC ON";
-								AccOn.start();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}*/
-					}
 				}
 
 
@@ -298,9 +271,8 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 
 				balls[ballId].moveToCenter();
 				try {
-					//transformPWM(mopedStream, socket);
-					moveMoped(mopedStream, socket);
-					turnMoped(mopedStream, socket);
+					transformPWM(mopedStream, socket);
+
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -337,9 +309,7 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 									- origenY[ballId]);
 
 							try {
-								//transformPWM(mopedStream, socket); //balls[ballId], bar2, Options.getInstance().getRBarValue());
-								moveMoped(mopedStream, socket);
-								turnMoped(mopedStream, socket);
+								transformPWM(mopedStream, socket); //balls[ballId], bar2, Options.getInstance().getRBarValue());
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
@@ -353,9 +323,7 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 								- origenY[ballId]);
 
 						try {
-							//transformPWM(mopedStream, socket); //balls[ballId], bar1, Options.getInstance().getLBarValue());
-							moveMoped(mopedStream, socket);
-							turnMoped(mopedStream, socket);
+							transformPWM(mopedStream, socket); //balls[ballId], bar1, Options.getInstance().getLBarValue());
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -411,7 +379,7 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 		}
 	}
 
-	public void turnMoped(MopedStream mopedStream, Socket socket) throws IOException {
+	/*public synchronized void turnMoped(MopedStream mopedStream, Socket socket) throws IOException {
 
 		double dist;
 		int x;
@@ -437,9 +405,9 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 			mopedStream.turn((byte) x3);
 		}
 
-	}
+	}*/
 
-	public void moveMoped(MopedStream mopedStream, Socket socket) throws IOException {
+	/*public synchronized void moveMoped(MopedStream mopedStream, Socket socket) throws IOException {
 		double dist;
 		int x;
 
@@ -456,14 +424,14 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 			}
 		}
 
-	}
+	}*/
 
 	public synchronized void transformPWM(MopedStream mopedStream, Socket socket) throws IOException {
 		double dist;
 		int x;
 
-		/* Calc and output speed values using the left bar */
-		/*dist = bar1.bottom - balls[0].getRect().centerY();
+
+		dist = bar1.bottom - balls[0].getRect().centerY();
 		x = (int) Math.ceil((Options.getInstance().getLBarValue() / (bar1.height() / dist)) - 100);
 		if (x < 0)
 			x--;
@@ -475,10 +443,10 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 				System.out.println(x);
 				mopedStream.move((byte) x);
 			}
-		}*/
+		}
 
-		/* Calc and output steering values using the right bar */
-		/*dist = balls[1].getRect().centerX() - bar2.left;
+
+		dist = balls[1].getRect().centerX() - bar2.left;
 		x = (int) Math.ceil((Options.getInstance().getRBarValue() / (bar2.width() / dist)) - 100);
 		if (x < 0)
 			x--;
@@ -497,8 +465,8 @@ public class PadView extends SurfaceView implements Callback, Runnable {
 			if (socket != null) {
 				canTextR = intToString(x3);
 				mopedStream.turn((byte) x3);
-			}*/
-	}
+			}}
+
 
 	private String intToString(int x) {
 		String padding = "0";

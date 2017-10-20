@@ -7,8 +7,8 @@
     <string name="connect">Connect</string>
     <string name="host_ip">Host:</string>
     <string name="host_port">Port:</string>
-    <string name="default_host_ip">192.168.1.1</string>
-    <string name="default_host_port">9000</string>
+    <string name="default_host_ip">Host IP</string>
+    <string name="default_host_port">3000</string>
     <string name="wifiConfig">WiFi configuration</string>
     <string name="disconnect">Disconnect</string>
 

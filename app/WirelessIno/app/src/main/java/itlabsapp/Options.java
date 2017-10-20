@@ -1,4 +1,4 @@
-package wirelessino;
+package itlabsapp;
 public class Options {
 
 	private static Options instance;

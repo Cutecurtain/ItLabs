@@ -1,4 +1,4 @@
-package wirelessino;
+package itlabsapp;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -9,7 +9,8 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import se.sics.sse.fresta.wirelessino.R;
+import src.main.java.itlabsapp.R;
+
 
 public class Main extends Activity {
 	public static final String TAG = "ItLabsApp";

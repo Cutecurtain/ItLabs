@@ -1,4 +1,4 @@
-package wirelessino;
+package itlabsapp;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -16,7 +16,8 @@ import android.widget.EditText;
 
 import android.os.StrictMode;
 
-import se.sics.sse.fresta.wirelessino.R;
+import src.main.java.itlabsapp.R;
+
 
 public class SocketConnector extends Activity {
     private final static int CONNECTION_TIMEOUT = 3000;

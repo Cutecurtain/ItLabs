@@ -1,4 +1,4 @@
-package wirelessino;
+package itlabsapp;
 
 import org.junit.Test;
 
@@ -17,23 +17,36 @@ public class MopedStreamTest {
 
     @Test
     public void move() throws Exception {
-        OutputStream dummyOutputStream = getDummyOutPutStream();
+
+        OutputStream dummyOutputStream = new OutputStream() {
+            @Override
+            public void write(int i) throws IOException {
+                System.out.println("Manual move " + i);
+                assertEquals(i,MopedStream.MOV);
+            }
+        };
+
         MopedStream testableMopedStream = new MopedStream(dummyOutputStream);
 
-        System.out.println("Manual move");
         testableMopedStream.move(testableMopedStream.MOV);
-        assertEquals(a,1);
 
     }
 
     @Test
     public void turn() throws Exception {
-        OutputStream dummyOutputStream = getDummyOutPutStream();
+
+        OutputStream dummyOutputStream = new OutputStream() {
+            @Override
+            public void write(int i) throws IOException {
+                System.out.println("Manual turn " + i);
+                assertEquals(i,MopedStream.TRN);
+            }
+        };
+
         MopedStream testableMopedStream = new MopedStream(dummyOutputStream);
 
-        System.out.println("Manual turn");
         testableMopedStream.turn(testableMopedStream.TRN);
-        assertEquals(a,2);
+
 
     }
 
@@ -47,6 +60,8 @@ public class MopedStreamTest {
         assertTrue(testableMopedStream.getAccStatus());
         testableMopedStream.acc(false);
         assertFalse(testableMopedStream.getAccStatus());
+
+        testableMopedStream.turn(testableMopedStream.ACC);
 
     }
 
