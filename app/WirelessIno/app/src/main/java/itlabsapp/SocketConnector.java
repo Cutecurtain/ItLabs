@@ -1,4 +1,4 @@
-package se.sics.sse.fresta.wirelessino;
+package itlabsapp;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -15,6 +15,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import android.os.StrictMode;
+
+import src.main.java.itlabsapp.R;
+
 
 public class SocketConnector extends Activity {
     private final static int CONNECTION_TIMEOUT = 3000;
@@ -97,6 +100,7 @@ public class SocketConnector extends Activity {
 
 
 					mopedStream.close();
+					mopedStream.acc(false);
 				}
 				
 				socket = new Socket();

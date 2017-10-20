@@ -1,4 +1,4 @@
-package se.sics.sse.fresta.wirelessino;
+package itlabsapp;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -22,10 +22,9 @@ public class MopedStream extends OutputStream {
 		}
 	}
 	public void turn(byte b) throws IOException {
-		if(!accEnabled){
 			write(TRN);
 			write(b);
-		}
+
 	}
 	public void acc(boolean enable) throws IOException {
 		accEnabled = enable;
