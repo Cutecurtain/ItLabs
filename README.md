@@ -29,4 +29,4 @@ The MOPED is run on python scripts. Our own code can be found in pi as well as i
 ## Camera
 We borrowed code for image recognition from blabla. The camera is used for making the MOPED follow an object of our choice. The object of our own choice is hard coded and cannot be changed without changing the code itself. We chose a red rectangle as our object. The camera code can be found in [`/OurPythonScripts/camReader.py`](/OurPythonScripts/camReader.py).
 
-*Further reading about our test methods can be found in our [`Reflection Report`](/ITLabs(1)).
+*Further reading about our test methods can be found in our [`Reflection Report`](/ITLabs(1).pdf).
