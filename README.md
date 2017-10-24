@@ -18,7 +18,7 @@
 
 # Projects
 The project is divided in three different parts. The python scripts, the app and the camera.
-In the beginning of the project the group made a  [`Social Contract`](/Social Contract.pdf), in which we state what unwritten rules the group should apply.
+In the beginning of the project the group made a  [`Social Contract`](/Social_Contract.pdf), in which we state what unwritten rules the group should apply.
 
 ## App
 Our app ItLabsApp is built on the previous app WirelessIno. However, we did add a button for turning ACC on and off, as well as some moderations to the GUI. We also added a connection between the newly established python server and the application, which can be found in [`/OurPythonScripts/car_driver.py`](/OurPythonScripts/car_driver.py) and in  [`/itlabsapp/MopedStream.java`](/app/WirelessIno/app/src/main/java/itlabsapp/MopedStream.java). Because of the many similarities with the previous code we did not test this code with FindBugs.*
